@@ -16,7 +16,7 @@ Data can be found in the `data` folder. The `araucaria_dataset` folder includes 
 
 All the results are saved in the `outputs` folder.
 
-<img alt="Bioclimatic niche" src="outputs/bioclimatic_niche_final_dezembro_docs.png" width="500">
+<img alt="Current_distribution_and_projected_distribution" src="outputs/fig_2.png" width="500">
 
 Figure 1: **Current connectivity of araucaria subpopulations**.
 
