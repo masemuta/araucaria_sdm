@@ -1,24 +1,19 @@
 ###################################################
 ## load library
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
+setwd("define_your_directory")
 
-#library(installr)
-#updateR()
 library(plotly)
 library(RColorBrewer)
 library(viridis)
-#library(rJava)
 library(raster)
 library(rgdal)
 library(ENMeval)
 library(maptools)
 library(XML)
 library(dismo) 
-#library(maxent) 
 library(sp) 
 library(MASS)
 library(maps) 
-library(mapdata) 
 library(plotrix) 
 library(fields) 
 library(spam) 
@@ -33,7 +28,6 @@ library(raster)
 library(dismo)
 library(maxnet)
 library(here)
-#help("here")
 
 # Getting environmental variables
 
