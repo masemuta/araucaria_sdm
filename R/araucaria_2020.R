@@ -757,26 +757,11 @@ for (gc in 1:length(gcms)) {
         names(future_3) <- c("bio01","bio04","bio11","bio12")
         
         writeRaster(future_3, filename= paste0(gcms[gc],"_",rcps[rc],"_",futu[fu]),format = "GTiff", overwrite = T)
-        #writeRaster(future_3$bio01, filename = paste0("bio01_",gcms[gc],"_",rcps[rc],"_",
-         #                                             futu[fu]), format = "GTiff", overwrite = T)
-        #writeRaster(future_3$bio02, filename = paste0("bio02_",gcms[gc],"_",rcps[rc],"_",
-        #                                              futu[fu]), format = "GTiff", overwrite = T)
-        #writeRaster(future_3$bio03, filename = paste0("bio03_",gcms[gc],"_",rcps[rc],"_",
-        #                                              futu[fu]), format = "GTiff", overwrite = T)
-        #writeRaster(future_3$bio04, filename = paste0("bio04_",gcms[gc],"_",rcps[rc],"_",
-         #                                             futu[fu]), format = "GTiff", overwrite = T)
-        #writeRaster(future_3$bio11, filename = paste0("bio11_",gcms[gc],"_",rcps[rc],"_",
-         #                                             futu[fu]), format = "GTiff", overwrite = T)
-        #writeRaster(future_3$bio12, filename = paste0("bio12_",gcms[gc],"_",rcps[rc],"_",
-         #                                             futu[fu]), format = "GTiff", overwrite = T)
-        
-        
+            
       }
     }
   }
 }
-
-
 
 for (i in 1: length(myRespName)) {
 
@@ -794,11 +779,9 @@ setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
   ## keep only all cells that are defined for all layers 
   # see: https://r-forge.r-project.org/forum/message.php?msg_id=41240&group_id=302
 myExpl <- stack(mask(myExpl, intersect_mask(myExpl)))
-#myExpl <- stack(mask(myExpl, intersect_mask(myExpl)))
-#set.seed(2589) ## Reproducible pseudo-absences
+set.seed(2589) ## Reproducible pseudo-absences
 myBiomodData <- BIOMOD_FormatingData(resp.var = p,
                                      expl.var = myExpl,
-                                     #resp.xy = myRespCoord,
                                      resp.name = myRespName,
                                      PA.nb.rep = 1,# see paper "how many pseudo-abs...
                                      PA.nb.absences = 10000,#see here why 1000, https://doi.org/10.1111/j.2041-210X.2011.00172.x
@@ -817,7 +800,7 @@ myBiomodOption <- BIOMOD_ModelingOptions(GLM= list(type="quadratic",interaction.
                                                            visible=FALSE,maximumiterations=500,memory_allocated=512,
                                                          product=F, threshold=F, hinge=F))
 
-set.seed(2589)
+set.seed(2589) ## Reproducible results
 myBiomodModelOut <- BIOMOD_Modeling (myBiomodData,
                                      models=c('MAXENT.Phillips','GLM','GAM','RF','ANN'),
                                      models.options= myBiomodOption,
@@ -833,7 +816,6 @@ myBiomodModelOut <- BIOMOD_Modeling (myBiomodData,
 # Table generating most important variables and algos evaluation ;)
 capture.output(get_evaluations(myBiomodModelOut),
                file=file.path(paste0("./Araucaria/outputs/formal_eval_evaluation.txt", sep="")))
-
 
 capture.output(get_variables_importance(myBiomodModelOut),
                file=file.path(paste0("./Araucaria/outputs/formal_models_variables_importance.txt", sep="")))
@@ -893,7 +875,7 @@ BiomodEF <- get(load(paste0("./Araucaria/proj_current/Araucaria.current.ensemble
 
 mod <- c("gs","he","no") # For global climate models (GCMs): NorESM1-M, HadGEM2-ES, GISS-E2-R,  
 rcp <- c("45","85") #  for RCP 45 and 85
-yr <- c("2080") # For 2050, 2080
+yr <- c("2080") # For 2080
 
 n.mod <- length(mod)*length(rcp)*length(yr)
 
@@ -941,6 +923,7 @@ n.mod <- length(mod)*length(rcp)*length(yr)
                                               omi.na=TRUE,
                                               on_0_1000=TRUE,
                                               output.format=".grd")
+        
         ## BIOMOD_EnsembleForecasting == FUTURE == ## Ensemble forecasting
         BiomodEF_Future <- BIOMOD_EnsembleForecasting(EM.output=myBiomodEM, ## Rules for assembling
                                                       projection.output=BiomodProjFuture, ## Individual model projection
