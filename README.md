@@ -22,7 +22,7 @@ Figure 1: **Current distribution and projected distribution**.
 
 <img alt="Current_and_projected_connectivity" src="outputs/Figure_4_v2.png" width="1000">
 
-Figure 1: **Current and projected connectivity**.
+Figure 2: **Current and projected connectivity**.
 ## License
 
 Data and R script are available under the GNU General Public License version 3 (see `LICENSE` file).
