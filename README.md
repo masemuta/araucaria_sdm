@@ -20,7 +20,7 @@ All the results are saved in the `outputs` folder.
 
 Figure 1: **Current distribution and projected distribution**.
 
-<img alt="Current_distribution_and_projected_distribution" src="outputs/fig_2.png" width="1000">
+<img alt="Current_and_projected_connectivity" src="outputs/Figure_4_v2.png" width="1000">
 
 Figure 1: **Current and projected connectivity**.
 ## License
