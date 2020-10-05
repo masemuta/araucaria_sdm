@@ -1,19 +1,24 @@
 ###################################################
 ## load library
-setwd("define_your_directory")
+setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 
+#library(installr)
+#updateR()
 library(plotly)
 library(RColorBrewer)
 library(viridis)
+#library(rJava)
 library(raster)
 library(rgdal)
 library(ENMeval)
 library(maptools)
 library(XML)
 library(dismo) 
+#library(maxent) 
 library(sp) 
 library(MASS)
 library(maps) 
+library(mapdata) 
 library(plotrix) 
 library(fields) 
 library(spam) 
@@ -37,142 +42,72 @@ setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/Bioclim/bio_clim_3")
 bil <- list.files(pattern=".bil") #30 arc
 
 # importar os arquivos no formato rasterstack
-#
-# importar os arquivos no formato rasterstack
 bil.bios <- stack(bil)
-plot(bil.bios)
 
 # renomear os arquivos .tif importados
-names(bif.bios) <- paste0('bio', 1:19)
+#names(bif.bios) <- paste0('bio', 1:19)
 
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
-
-# altitude
-altmat_2 <- raster("./MDE_Malu/dados_mde_malu/rastert_alt_00.asc") # Altitude
-# remnants atlantic rainfores
-rem_mata <- raster("./remanescente_MA/ma_rem.tif")
-
-
-#define proper CRS
-crs(altmat_2) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
-crs(rem_mata) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
 
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 
 mata_atlantica <- readOGR("./Contorno_MA_Original/Contorno MA Original.shp")
+crs(mata_atlantica) <- "+proj=longlat +datum=WGS84 +no_defs +type=crs"
 data.shape <-readOGR("./FOM_ecoregion/Ecorregiões Sul.shp")
 mascara <- data.shape[data.shape$ECO_NAME == "Araucaria moist forests",]
-
+#mascaranew <- data.shape[data.shape$AREA == "Atlantic Forests"]
+mascara2 <- data.shape[data.shape$ECO_NAME == "Serra do Mar coastal forests",]
+mascarateste2 <- union(mascara,mascara2)
+#mascarafim <- union(mascarateste2,mascara3)
+plot(mascarateste2)
 # Set same extent:
-mascara_2 <- raster(mascara)
+
+mascara_2 <- raster(mascarateste2)
 res(mascara_2) <- 0.008333333 # resolution from altitude
 
-r.new2 <- resample(rem_mata,mascara_2,"bilinear") # this one is ok
-#r.new3 <- resample(altmat_2,altmat_2,"bilinear") 
-r.new3 <- resample(altmat_2,mascara_2,"bilinear")
-
-#### Worldclim bioclimatic variables # set same rosolution
-r.new01 <- resample(bil.bios$bio_1,mascara_2,"bilinear")
-r.new02 <- resample(bil.bios$bio_2,mascara_2,"bilinear")
-r.new03 <- resample(bil.bios$bio_3,mascara_2,"bilinear")
-r.new04 <- resample(bil.bios$bio_4,mascara_2,"bilinear")
-r.new05 <- resample(bil.bios$bio_5,mascara_2,"bilinear")
-r.new06 <- resample(bil.bios$bio_6,mascara_2,"bilinear")
-r.new07 <- resample(bil.bios$bio_7,mascara_2,"bilinear")
-r.new08 <- resample(bil.bios$bio_8,mascara_2,"bilinear")
-r.new09 <- resample(bil.bios$bio_9,mascara_2,"bilinear")
-r.new10 <- resample(bil.bios$bio_10,mascara_2,"bilinear")
-r.new11 <- resample(bil.bios$bio_11,mascara_2,"bilinear")
-r.new12 <- resample(bil.bios$bio_12,mascara_2,"bilinear")
-r.new13 <- resample(bil.bios$bio_13,mascara_2,"bilinear")
-r.new14 <- resample(bil.bios$bio_14,mascara_2,"bilinear")
-r.new15 <- resample(bil.bios$bio_15,mascara_2,"bilinear")
-r.new16 <- resample(bil.bios$bio_16,mascara_2,"bilinear")
-r.new17 <- resample(bil.bios$bio_17,mascara_2,"bilinear")
-r.new18 <- resample(bil.bios$bio_18,mascara_2,"bilinear")
-r.new19 <- resample(bil.bios$bio_19,mascara_2,"bilinear")
-## or 
-#=======================================================
 ex_2 <- extent(mascara_2)
 
-#mataatl_1 <- crop(r.new2,ex_2)
-#altmat_1 <- crop(r.new3,ex_2)
-# ===========================
-#bio01_1 <-  crop(mascara_2,bil.bios$bio_19)
-#bio02_1 <- crop(r.new02,ex_2)
-#bio03_1 <- crop(r.new03,ex_2)
-#bio04_1 <- crop(r.new04,ex_2)
-#bio05_1 <- crop(r.new05,ex_2)
-#bio06_1 <- crop(r.new06,ex_2)
-#bio07_1 <- crop(r.new07,ex_2)
-#bio08_1 <- crop(r.new08,ex_2)
-#bio09_1 <- crop(r.new09,ex_2)
-#bio10_1 <- crop(r.new10,ex_2)
-#bio11_1 <- crop(r.new11,ex_2)
-#bio12_1 <- crop(r.new12,ex_2)
-#bio13_1 <- crop(r.new13,ex_2)
-#bio14_1 <- crop(r.new14,ex_2)
-#bio15_1 <- crop(r.new15,ex_2)
-##bio16_1 <- crop(r.new16,ex_2)
-#bio17_1 <- crop(r.new17,ex_2)
-#bio18_1 <- crop(r.new18,ex_2)
-#bio19_1 <- crop(r.new19,ex_2)
+# Crop the climate layers to the extent of Mixed Ombrophilous Forest
+altitude1 <- raster("./MDE_Malu/dados_mde_malu/rastert_alt_00.asc") # Altitude
+altitude1 <- raster("http://www.dpi.inpe.br/amb_data/Brasil/altitude_br.asc") # Ambdata website 30 arc-sec res
+altitude <- resample(altitude1,mascara_2,"bilinear")
+altitude <- crop (altitude, ex_2)
+altitude <- mask(altitude,mascarateste2)
+crs(altitude) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+plot(altitude)
 
-# Removendo dados que ficam foram do raster extent da FOM
-r.new_2 <- mask(r.new2,mascara)
-r.new_3 <- mask(r.new3, mascara)
-plot(r.new_3)
+#### bioclim
+bio_curr <- resample(bil.bios, mascara_2,"bilinear")
+bio_curr <- crop(bio_curr, ex_2)
+bio_curr <- mask(bio_curr, mascarateste2)
+#names(bio_curr) <- paste0('bio', 1:19)
 
-###################################
-r.new_01 <- mask(r.new01, mascara)
-r.new_02 <- mask(r.new02, mascara)
-r.new_03 <- mask(r.new03, mascara)
-r.new_04 <- mask(r.new04, mascara)
-r.new_05 <- mask(r.new05, mascara)
-r.new_06 <- mask(r.new06, mascara)
-r.new_07 <- mask(r.new07, mascara)
-r.new_08 <- mask(r.new08, mascara)
-r.new_09 <- mask(r.new09, mascara)
-r.new_10 <- mask(r.new10, mascara)
-r.new_11 <- mask(r.new11, mascara)
-r.new_12 <- mask(r.new12, mascara)
-r.new_13 <- mask(r.new13, mascara)
-r.new_14 <- mask(r.new14, mascara)
-r.new_15 <- mask(r.new15, mascara)
-r.new_16 <- mask(r.new16, mascara)
-r.new_17 <- mask(r.new17, mascara)
-r.new_18 <- mask(r.new18, mascara)
-r.new_19 <- mask(r.new19, mascara)
+predictors_sdm <- bio_curr
+crs(predictors_sdm) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+predictors_sdm <- addLayer(altitude,bio_curr)
+plot(predictors_sdm)
 
 # TESTANDO 
-par(mfrow=c(1,1))
-plot(r.new_01)
-plot(mascara,add=T, axes=T)
 
-predictors_good <- stack(r.new_2,r.new_3,r.new_01,r.new_02,
-                         r.new_03,r.new_04,r.new_05,r.new_06,r.new_07,r.new_08,r.new_09,
-                         r.new_10,r.new_11,r.new_12,r.new_13,r.new_14,r.new_15,r.new_16,
-                         r.new_17,r.new_18,r.new_19)
 ### 13:11 - 13:59
 #predictors_good_1 <- mask(predictors_good, mascara)
-predictors_good_1 <- predictors_good 
+#predictors_good_1 <- predictors_good 
 
 ## all variables inside the study mask
-names(predictors_good_1) <- c("remnant", "altitude","bio01","bio02","bio03", "bio04","bio05","bio06",
-                              "bio07","bio08","bio09","bio10","bio11","bio12","bio13",
-                              "bio14","bio15","bio16","bio17","bio18","bio19")
+names(predictors_sdm) <- c("altitude","bio1","bio10","bio11", "bio12","bio13","bio14",
+                              "bio15","bio16","bio17","bio18","bio19","bio2","bio3",
+                              "bio4","bio5","bio6","bio7","bio8","bio9")
 
 #create folder to save organized (inside the mask) variables
 #dir.create('variaves_mascara_2020')
 setwd('./variaves_mascara_2020') 
 
 
-writeRaster(predictors_good_1,('all_variables_mask'), format = 'GTiff', overwrite=T)
+writeRaster(predictors_sdm,('all_variables_mask_plos'), format = 'GTiff', overwrite=T)
 
 
 list.files(pattern=".tif")
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
-#dir.create('table_correlation_2020')
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/table_correlation_2020/") 
 
 
@@ -180,32 +115,30 @@ setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/table_correlation_2020/")
 
 # Avaliando se tenho problema nas minhas variáveis
 
-remn <- c(as.matrix(predictors_good_1$remnant)) # mata atlanttica
-altmat_val <- c(as.matrix(predictors_good_1$altitude)) # altitude
+altmat_val <- c(as.matrix(predictors_sdm$altitude)) # altitude
 ##############
-bio01_val <- c(as.matrix(predictors_good_1$bio01)) # bio1
-bio02_val <- c(as.matrix(predictors_good_1$bio02)) # bio2
-bio03_val <- c(as.matrix(predictors_good_1$bio03)) # bio3
-bio04_val <- c(as.matrix(predictors_good_1$bio04)) # bio4
-bio05_val <- c(as.matrix(predictors_good_1$bio05)) # bio5
-bio06_val <- c(as.matrix(predictors_good_1$bio06)) # bio6
-bio07_val <- c(as.matrix(predictors_good_1$bio07)) # bio7
-bio08_val <- c(as.matrix(predictors_good_1$bio08)) # bio8
-bio09_val <- c(as.matrix(predictors_good_1$bio09)) # bio9
-bio10_val <- c(as.matrix(predictors_good_1$bio10)) # bio10
-bio11_val <- c(as.matrix(predictors_good_1$bio11)) # bio11
-bio12_val <- c(as.matrix(predictors_good_1$bio12)) # bio12
-bio13_val <- c(as.matrix(predictors_good_1$bio13)) # bio13
-bio14_val <- c(as.matrix(predictors_good_1$bio14)) # bio14
-bio15_val <- c(as.matrix(predictors_good_1$bio15)) # bio15
-bio16_val <- c(as.matrix(predictors_good_1$bio16)) # bio16
-bio17_val <- c(as.matrix(predictors_good_1$bio17)) # bio17
-bio18_val <- c(as.matrix(predictors_good_1$bio18)) # bio18
-bio19_val <- c(as.matrix(predictors_good_1$bio19)) # bio19
+bio01_val <- c(as.matrix(predictors_sdm$bio1)) # bio1
+bio02_val <- c(as.matrix(predictors_sdm$bio2)) # bio2
+bio03_val <- c(as.matrix(predictors_sdm$bio3)) # bio3
+bio04_val <- c(as.matrix(predictors_sdm$bio4)) # bio4
+bio05_val <- c(as.matrix(predictors_sdm$bio5)) # bio5
+bio06_val <- c(as.matrix(predictors_sdm$bio6)) # bio6
+bio07_val <- c(as.matrix(predictors_sdm$bio7)) # bio7
+bio08_val <- c(as.matrix(predictors_sdm$bio8)) # bio8
+bio09_val <- c(as.matrix(predictors_sdm$bio9)) # bio9
+bio10_val <- c(as.matrix(predictors_sdm$bio10)) # bio10
+bio11_val <- c(as.matrix(predictors_sdm$bio11)) # bio11
+bio12_val <- c(as.matrix(predictors_sdm$bio12)) # bio12
+bio13_val <- c(as.matrix(predictors_sdm$bio13)) # bio13
+bio14_val <- c(as.matrix(predictors_sdm$bio14)) # bio14
+bio15_val <- c(as.matrix(predictors_sdm$bio15)) # bio15
+bio16_val <- c(as.matrix(predictors_sdm$bio16)) # bio16
+bio17_val <- c(as.matrix(predictors_sdm$bio17)) # bio17
+bio18_val <- c(as.matrix(predictors_sdm$bio18)) # bio18
+bio19_val <- c(as.matrix(predictors_sdm$bio19)) # bio19
 
 ## create a data-frame
-tabela <- data.frame(cbind(remn,
-                           altmat_val,bio01_val,bio02_val,bio03_val,bio04_val,bio05_val,bio06_val,
+tabela <- data.frame(cbind(altmat_val,bio01_val,bio02_val,bio03_val,bio04_val,bio05_val,bio06_val,
                            bio07_val,bio08_val,bio09_val,bio10_val,bio11_val,bio12_val,
                            bio13_val,bio14_val,bio15_val,bio16_val,bio17_val,
                            bio18_val,bio19_val))
@@ -223,7 +156,6 @@ round(cor(tabela_validos),2)
 par(mfrow=c(1,1))
 
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
-# dir.create('table_correlation_2019')  # criar pasta no diretorio
 setwd("./table_correlation_2020")
 
 hist(cor(tabela_validos), main="Variable_correlation", col="gray90")
@@ -235,7 +167,6 @@ write.table(ifelse(cor(tabela_validos) >= 0.7, 'Sim', 'Não'), 'cor_pres_afirmac
 see <- (ifelse(cor(tabela_validos) >= 0.7, 'Yes', 'No'))
 
 # plot da correlacao
-#install.packages("corrplot")
 library(corrplot)
 
 tiff('camadas_ambientais_2020.tif', width = 25, height= 25, units = 'cm', res = 1000, compression = 'lzw')
@@ -252,7 +183,6 @@ corrplot(cor(tabela_validos), type = "lower", diag = F,
          mar = c(3, 0.5, 2, 1), tl.srt = 45)
 dev.off()
 
-
 # exportar tabela
 tabela.cor <- cor(tabela_validos)
 write.table(tabela.cor, 'tabela_cor_2020.txt', row.names = F, quote = F, sep = '\t')
@@ -261,7 +191,7 @@ write.table(round(tabela.cor, 2), 'tabela_cor_2020.xls', row.names = F,
 
 # PCA for colinearity among variables
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
-#dir.create('pca_2020') 
+
 setwd('./pca_2020')
 
 # pca do pacote 'stats'
@@ -276,7 +206,7 @@ screeplot(pca, main = 'Autovalues')
 abline(h = 1, col = 'red', lty = 2) # 5 variables represent the whole bioclim variables
 
 # import the figure
-tiff('screeplot_2220.tif', width = 20, height = 20, units = 'cm', 
+tiff('screeplot_2020_plos.tif', width = 20, height = 20, units = 'cm', 
      res = 1000, compression = 'lzw')
 screeplot(pca, main = 'PCA Auto-value')
 abline(h = 1, col = 'red', lty = 2)
@@ -296,14 +226,14 @@ write.table(round(abs(pca$rotation[, 1:5]), 2), 'contr_pca_2020.xls',
 # plot
 biplot(pca)
 # import the figure
-tiff('pca_2220.tif', width = 20, height = 20, units = 'cm', 
+tiff('pca_2020_plos_2.tif', width = 20, height = 20, units = 'cm', 
      res = 1000, compression = 'lzw')
 biplot(pca, main = 'PCA Auto-value')
 #abline(h = 1, col = 'red', lty = 2)
 dev.off()
 
 # extraindo valores dos arquivos .asc e omitindo os NAs
-as.v <- values(predictors_good_1)
+as.v <- values(predictors_sdm)
 as.v.na <- na.omit(as.v)
 head(as.v.na)
 dim(as.v.na)
@@ -312,7 +242,7 @@ dim(as.v.na)
 # pca dos raster
 #install.packages('RStoolbox')
 library(RStoolbox)
-pca.as <- rasterPCA(predictors_good_1, spca = T) # esse comando ira demorar
+pca.as <- rasterPCA(predictors_sdm, spca = T) # esse comando ira demorar
 
 # contribuicao dos componentes
 summary(pca.as$model)
@@ -324,7 +254,7 @@ abline(h = 1, col = 'red', lty = 2)
 dev.off()
 
 
-tiff('screeplot_raster.tif', width = 20, height = 20, units = 'cm',
+tiff('screeplot_raster_plos_2020_demorado.tif', width = 20, height = 20, units = 'cm',
      res = 1000, compression = 'lzw')
 screeplot(pca.as$model, main = 'Autovalues')
 abline(h = 1, col = 'red', lty = 2)
@@ -427,7 +357,7 @@ fa.as <- fa(as.v.na.p, nfactors = 5, rotate = 'oblimin', fm = 'ml')
 as.loadings <- loadings(fa.as)
 
 # exportar screeplot
-tiff('screeplot_fatorial_2.tif', width = 20, height = 20, units = 'cm', res = 1000,
+tiff('screeplot_fatorial_2020_ploa.tif', width = 20, height = 20, units = 'cm', res = 1000,
      compression = 'lzw')
 fa.diagram(as.loadings)
 
@@ -441,37 +371,47 @@ write.table(abs(round(as.loadings, 2)), 'as_loadings.xls', row.names = T, sep = 
 # PCA
 #==================================================================================###]
 # variaveis escolhidas para o modelo: 
-# usar Bio 01, 04, 11, 12, alem da mata atl
+# usar Bio 01, 02, 04, 12, alem da mata atl
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
-predictors_good_1
-predictors_after_prean <- stack(predictors_good_1$remnant,#Ecological aspects
-                                #predictors_good_1$altitude,#Fatorial
-                                predictors_good_1$bio01, #From PCA1
-                                predictors_good_1$bio04, #Fatorial 
-                                predictors_good_1$bio11, #From PCA2
-                                predictors_good_1$bio12) #Ecological aspects
+
+predictors_after_prean <- stack(predictors_sdm$bio01, #From PCA1
+  predictors_sdm$bio2, #Fatorial 
+  predictors_sdm$bio4, #From PCA2
+  predictors_sdm$bio12, predictors_sdm$altitude) #Ecological aspects
 plot(predictors_after_prean, axes=T)
 ### Caso queira recomeçarr a aanálise sem PCA e gráfico de correlaÃ§Ã£o
 getwd()
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 #dir.create('rasters_2020')
 setwd("./rasters_2020/")
 
-writeRaster(predictors_after_prean$remnant, filename="remnants_2020_art_1", format='GTiff',overwrite=T)
-remnants <- as(predictors_after_prean$remnant, 'SpatialPolygons')
-crs(remnants) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
-shapefile(remnants, 'remnants_qgis.shp', overwrite=T)
+#writeRaster(predictors_after_prean$remnant, filename="remnants_2020_art_1", format='GTiff',overwrite=T)
+#remnants <- as(predictors_after_prean$remnant, 'SpatialPolygons')
+#crs(remnants) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+#shapefile(remnants, 'remnants_qgis.shp', overwrite=T)
 
 # save rasters files
 writeRaster(predictors_after_prean$bio01, filename="bio01_2020.tif", format='GTiff', overwrite=T)
-#writeRaster(predictors_after_prean$bio02, filename="bio02_2020.tif", format='GTiff', overwrite=T)
+writeRaster(predictors_after_prean$bio2, filename="bio02_2020.tif", format='GTiff', overwrite=T)
 #writeRaster(predictors_after_prean$bio03, filename="bio03_2020.tif", format='GTiff', overwrite=T)
-writeRaster(predictors_after_prean$bio04, filename="bio04_2020.tif", format='GTiff', overwrite=T)
-writeRaster(predictors_after_prean$bio11, filename="bio11_2020.tif", format='GTiff', overwrite=T)
+writeRaster(predictors_after_prean$bio4, filename="bio04_2020.tif", format='GTiff', overwrite=T)
+#writeRaster(predictors_after_prean$bio11, filename="bio11_2020.tif", format='GTiff', overwrite=T)
 writeRaster(predictors_after_prean$bio12, filename="bio12_2020.tif", format='GTiff', overwrite=T)
 writeRaster(predictors_after_prean$altitude, filename="altitude.tif", format='GTiff', overwrite=T)
 writeRaster(predictors_after_prean, filename="all_variables_2020.tif", format='GTiff',overwrite=T)
 
+predictors_after_prean <- list.files(pattern=".tif") #30 arc
+
+# Option 1
+altitude <- raster("altitude.tif")
+bio01 <- raster("bio01_2020.tif")
+bio02 <- raster("bio02_2020.tif")
+bio04 <- raster("bio04_2020.tif")
+bio12 <- raster("bio12_2020.tif")
+# Option 2
+
+predictos_after_prean <- stack("all_variables_2020.tif")
+names(predictos_after_prean) <- c("bio01","bio02","bio04","bio12","altitude")
+plot(predictos_after_prean)
 
 ## Species data
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
@@ -517,33 +457,62 @@ head(dados)
 
 ac <- dados #testing points of the species
 coordinates(ac) <- ~lon+lat
-projection(ac) <- CRS('+proj=longlat +datum=WGS84')
-Imart.spdf2 <- ac[mascara,] # will give error (identicalCRS)
+projection(ac) <- CRS('+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0')
+Imart.spdf2 <- ac[mascarafim,] # will give error (identicalCRS)
 projection(ac)
-projection(mascara)
-projection(mascara)<-projection(ac)
-Imart.spdf2 <- ac[mascara,]
-x11()
-plot(mascara)
-points(dados, col='black', pch=20) #original dataset
-points(Imart.spdf2,col="green", pch=20) # p796 points inside study mask
-length(Imart.spdf2) # 796
-dev.off()
+projection(mascarafim)
+projection(mascarafim)<-projection(ac)
+Imart.spdf2 <- ac[mascarafim,]
 
+############### remove ALTO Paraná
+mascarateste2
+mascara_fim <- raster(mascarateste2)
+res(mascara_fim) <- 0.008333333 # resolution from altitude
+
+ex_fim <- extent(mascara_fim)
+
+ac <- dados #testing points of the species
+coordinates(ac) <- ~lon+lat
+projection(ac) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+Imart.spdf2 <- ac[mascara_fim,] # will give error (identicalCRS)
+projection(ac)
+projection(mascarateste2)
+projection(mascara_fim)<-projection(ac)
+Imart.spdf3 <- ac[mascarateste2,]
+projection(Imart.spdf3) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+new_data3 <- as.data.frame(Imart.spdf3)
+list1 <- 1:823
+list2 <- rep("Araucaria_angustifolia", length(list1))
+list3 <- cbind(list2,new_data3)
+mask_data3 <- list3
+mask_data3$presence <- rep(1,nrow(mask_data3)) 
+names(mask_data3) <- c("Species", "lon", "lat", "Presence")
+
+#dir.create('ocorrencia_na_mascara_2020')
+# mudar diretorio
+getwd()
+setwd('./ocorrencia_na_mascara_2020')
+# write .csv with correct dataset
+write.csv(mask_data3, file = "pts_mask_2020.csv")
+
+setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 
 # Plot study area
-estados <- readOGR("./estados.shp") 
+estados <- readOGR("./estados/estados.shp") 
 plot(estados[estados$Regiao=="SUL",], add=T)
-projection(estados) = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+plot(mascarateste2, add=T)
+projection(estados) = CRS("+proj=longlat +datum=WGS84 +no_defs")
 
-m <- getMap()
-brasil <- m[which(m$NAME == "Brazil"), ]
-paraguai <- m[which(m$NAME == "Paraguay"), ]
-arg <- m[which(m$NAME == "Argentina"), ]
-uru <- m[which(m$NAME == "Uruguay"), ]
-bol <- m[which(m$NAME == "Bolivia"), ]
-per <- m[which(m$NAME == "Peru"), ]
-chile <- m[which(m$NAME == "Chile"), ]
+library(RgoogleMaps)
+library(maps) #mapas simples, eixos, escala, cidades 
+library(mapdata) #base de dados WorldHires e rios
+library(rworldmap) #outra base de dados de mapas do mundo
+library(maptools) #Ler ESRI shapefiles 
+library(mapproj) #Projeções e grids
+library(ggmap) #Gmaps, OSM + mapas baseados em ggplot2
+library(rgdal)
+
 
 setwd("./uc_brasil/")
 ucs <- readOGR("./unidade_protecao_integralPolygon.shp")
@@ -558,112 +527,44 @@ projection(ucs_suste) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +
 # combine both spdf
 ucs_full <- rbind(ucs,ucs_suste)
 # crop it for study area
-ucs_full <- crop(ucs_full,mascara)
-ucs_suste1 <- crop(ucs_suste,mascara)
+ucs_full1 <- crop(ucs_full,mascara)
+ucs_full2 <- crop(ucs_full,mascara2)
+#ucs_full3 <- crop(ucs_full,mascara3)
+ucs_full <- rbind(ucs_full1,ucs_full2)
+
 ### Map pf Study Area
 # Legend specifications
+setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 
-# Plot
-pdf(paste0("./Araucaria/outputs/study_area.pdf"),width=15,height=12)
-#par(mar=c(2,3,2,2))
-plot(mata_atlantica, axes=T, col="gray30",
-     main="Study Area", xlab="Longitude", ylab="Latitude")
-plot(mascara, axes=T, col="gray7", add=T)
-legend(-45, -24, legend=c("Atlantic Rainforest Domain",
-                          "Mixed Ombrophilous Forest - Study Area",
-                          "Tropic of Capricorn - Dashed Line"),
-       col=c("black","black","black"),
-       fill=c("gray40","green","black"),box.lty=0)
-abline(h=-23.5, lty=2, col="black")
-plot(brasil, add=T)
-plot(paraguai, add=T)
-plot(arg, add=T)
-plot(uru, add=T)
-plot(bol, add=T)
-plot(per, add=T)
-plot(chile, add=T)
-plot(estados[estados$Regiao=="SUL",], add=T,col="white")
-#plot(wrld_simpl, add=TRUE)
-# NOT RUN {
-scalebar(750, xy = c(-45,-30), type = 'bar', divs = 2, below = c('km'), 
-         lonlat = T, label=c(0,750,1500), adj=c(2, -2), lwd = 2)
-dev.off()
-
-
-# Plot
-pdf(paste0("./Araucaria/outputs/study_area_zoom.pdf"),width=15,height=12)
-#par(mar=c(2,3,2,2))
-plot(mascara, axes=T, col="green",
-     main="Study Area", xlab="Longitude", ylab="Latitude")
-plot(ucs_full, add=T, col="yellow")
-plot(ucs_suste1$classifica,add=T, col="red")
-legend(-45, -24, legend=c("Atlantic Rainforest Domain",
-                          "Mixed Ombrophilous Forest - Study Area",
-                          "Tropic of Capricorn - Dashed Line"),
-       col=c("black","black","black"),
-       fill=c("gray40","green","black"),box.lty=0)
-points(p,col="black", pch=20) # p293 points inside study mask
-
-dev.off()
-
-
-#########################
-
-pdf(paste0("./Araucaria/outputs/study_area.pdf"),width=10,height=12)
-par(mar=c(2,3,2,2))
-plot(mata_atlantica,col= "gray60", main= "Study Area", axes=T)
-plot(mascara, axes=T, col="green", add=T)
-legend(-45, -24, legend=c("Atlantic Rainforest Domain",
-                          "Mixed Ombrophilous Forest"),
-       col=c("black","black"),
-       fill=c("gray40","green"),box.lty=0)
-points(p,col="black", pch=20) # p295 points final
-plot(wrld_simpl, add=TRUE)
-# Add scalebar
-dev.off()
-
-#######################################
-new_data <- as.data.frame(Imart.spdf2)
-list1 <- 1:796
-list2 <- rep("Araucaria_angustifolia", length(list1))
-list3 <- cbind(list2,new_data)
-mask_data <- list3
-mask_data$presence <- rep(1,nrow(mask_data)) 
-names(mask_data) <- c("Species", "lon", "lat", "Presence")
-head(mask_data)
-
-
+######################################
 ################################  ########################
-
-#dir.create('ocorrencia_na_mascara_2020')
-# mudar diretorio
-getwd()
-setwd('./ocorrencia_na_mascara_2020')
-# write .csv with correct dataset
-write.csv(mask_data, file = "pts_mask_2020.csv")
 
 ##################################################
 ### Starting the modeling Session - here we go, grab a beer :)
 
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/ocorrencia_na_mascara_2020/")
 testando <- read.csv("pts_mask_2020.csv", header=T)
-testando <- testando[,-1]
 
 library(biomod2)
 DataSpecies <- testando
-names(DataSpecies) <- c("Species", "lon", "lat", "Araucaria")
+DataSpecies <- DataSpecies[,-6]
+DataSpecies <- DataSpecies[,-1]
 head(DataSpecies)
+
+names(DataSpecies) <- c("Species", "lon", "lat", "Araucaria")
 
 #loading environmental layers
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 #dir.create('rasters_2020')
 setwd("./rasters_2020/")
-predictors_after_prean <- stack('all_variables_2020.tif')
-names(predictors_after_prean) <- c("remnant","altitude","bio01","bio04","bio11","bio12")
-plot(predictors_after_prean)
+#predictors_after_prean <- stack('all_variables_2020.tif')
+#names(predictors_after_prean) <- c("remnant","altitude","bio01","bio04","bio11","bio12")
+#plot(predictors_after_prean)
 
-myExpl <- dropLayer(predictors_after_prean, c(2))
+#myExpl <- predictos_after_prean
 
+myExpl <- dropLayer(predictos_after_prean, c(5))
+plot(myExpl)
 
 # Name of my species
 myRespName <- 'Araucaria'
@@ -694,21 +595,67 @@ wcomp <- which(complete.cases(data.xy))
 
 ## Transform as a SpatialPointsDataFrame and SpatialPoints (for presence only)
 d <- SpatialPointsDataFrame(coords=Coords.presence[wcomp,], data=data.xy[wcomp,],
-                            proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 "))
+                            proj4string=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
 
 p <- SpatialPoints(d) ## This is used for presence-only data
 
 
-projection(p) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 ")
+projection(p) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
 
 myRespCoord <- d@coords
 str(DataSpecies)
 
 ## Number of 1km pixels with at least one presence
 npix <- nrow(d)
-plot(myExpl$remnant)
-plot(d,pch=19,add=TRUE,cex=1)
 
+# Plot study area
+plot.new()
+setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
+
+pdf(paste0("./Araucaria/outputs/study_area.pdf"),width=15,height=12)
+#par(mar=c(5,3,5,3))
+plot(mata_atlantica, axes=T, col="gray90",
+     main="Study Area", xlab="Longitude", ylab="Latitude")
+#plot(mascara3, axes=T, col=viridis_pal(option = "E",direction = -1)(1), add=T)
+#plot(mascara3, axes=T, col="#FDE725FF", add=T)
+plot(mascara, axes=T, col="#35B779FF", add=T)
+plot(mascara2, axes=T, col="#3E4A89FF", add=T)
+#plot(mascara2, axes=T, col=viridis_pal(option = "D")(1), add=T)
+legend(-45, -24, legend=c("Atlantic Rainforest Domain",
+                          #"Alto Paraná Atlantic Forests",
+                          "Mixed Ombrophilous Forest",
+                          "Dense Ombrophilous Forests",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Occurrence points (N=324)"),
+       col=c("black","black","black","black","black"),
+       fill=c("gray90","#35B779FF","#3E4A89FF","black","black"),box.lty=0)
+abline(h=-23.5, lty=2, col="black")
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+plot(wrld_simpl, add=TRUE)
+#points(p,col="black", pch=20) # p295 points final
+scalebar(750, xy = c(-68,-33), type = 'bar', divs = 3, below = c('km'), 
+         lonlat = T, lwd = 3)
+dev.off()
+
+
+# Plot
+pdf(paste0("./Araucaria/outputs/study_area1_zoom3.pdf"),width=15,height=12)
+par(mar=c(5,3,5,3))
+plot(predictors_sdm$altitude,col=viridis_pal(option = "B")(255),axes=T)
+plot(ucs_full, axes=T, col="#35B779FF", add=T)
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Study area altitudinal range (m)",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Protected Areas",
+                          "Occurrence points (N=324)"),
+       col=c("black","black","black","black"),
+       fill=c("gray90","black","#35B779FF","white"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 3)
+points(p,col="white", pch=20) # p293 points inside study mask
+dev.off()
 
 ## keep only all cells that are defined for all layers 
 # see: https://r-forge.r-project.org/forum/message.php?msg_id=41240&group_id=302
@@ -736,26 +683,30 @@ for (gc in 1:length(gcms)) {
         
         #variable <- raster(paste0(tif_fut,gcms[gc],rcps[rc],years[ye],bios[bi],".tif"))
         bio01 <- raster(paste0(gcms[gc],rcps[rc],"bi",years[ye],"1",".tif"))
-        #bio02 <- raster(paste0(gcms[gc],rcps[rc],"bi",years[ye],"2",".tif"))
+        bio02 <- raster(paste0(gcms[gc],rcps[rc],"bi",years[ye],"2",".tif"))
         #bio03 <- raster(paste0(gcms[gc],rcps[rc],"bi",years[ye],"3",".tif"))
         bio04 <- raster(paste0(gcms[gc],rcps[rc],"bi",years[ye],"4",".tif"))
-        bio11 <- raster(paste0(gcms[gc],rcps[rc],"bi",years[ye],"11",".tif"))
+        #bio11 <- raster(paste0(gcms[gc],rcps[rc],"bi",years[ye],"11",".tif"))
         bio12 <- raster(paste0(gcms[gc],rcps[rc],"bi",years[ye],"12",".tif"))
         
-        variable <- stack(bio01,bio04,bio11,bio12)
+        variable <- stack(bio01,bio02,bio04,bio12)
         
         crs(variable)  <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
-        
+        #+proj=longlat +datum=WGS84 +no_defs (to use above)
         future_1 <- resample(variable,mascara_2,"bilinear")
-        future_3 <- mask(future_1,mascara)
-        names(future_3) <- c("bio01","bio04","bio11","bio12")
+        future_1 <- crop(future_1, ex_2)
+        future_3 <- mask(future_1, mascarateste2)
+        names(future_3) <- c("bio01","bio02","bio04","bio12")
         
         writeRaster(future_3, filename= paste0(gcms[gc],"_",rcps[rc],"_",futu[fu]),format = "GTiff", overwrite = T)
-            
+        
+        
       }
     }
   }
 }
+
+
 
 for (i in 1: length(myRespName)) {
 
@@ -773,9 +724,10 @@ setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
   ## keep only all cells that are defined for all layers 
   # see: https://r-forge.r-project.org/forum/message.php?msg_id=41240&group_id=302
 myExpl <- stack(mask(myExpl, intersect_mask(myExpl)))
-set.seed(2589) ## Reproducible pseudo-absences
+#set.seed(2589) ## Reproducible pseudo-absences
 myBiomodData <- BIOMOD_FormatingData(resp.var = p,
                                      expl.var = myExpl,
+                                     #resp.xy = myRespCoord,
                                      resp.name = myRespName,
                                      PA.nb.rep = 1,# see paper "how many pseudo-abs...
                                      PA.nb.absences = 10000,#see here why 1000, https://doi.org/10.1111/j.2041-210X.2011.00172.x
@@ -794,7 +746,7 @@ myBiomodOption <- BIOMOD_ModelingOptions(GLM= list(type="quadratic",interaction.
                                                            visible=FALSE,maximumiterations=500,memory_allocated=512,
                                                          product=F, threshold=F, hinge=F))
 
-set.seed(2589) ## Reproducible results
+set.seed(2589)
 myBiomodModelOut <- BIOMOD_Modeling (myBiomodData,
                                      models=c('MAXENT.Phillips','GLM','GAM','RF','ANN'),
                                      models.options= myBiomodOption,
@@ -811,6 +763,7 @@ myBiomodModelOut <- BIOMOD_Modeling (myBiomodData,
 capture.output(get_evaluations(myBiomodModelOut),
                file=file.path(paste0("./Araucaria/outputs/formal_eval_evaluation.txt", sep="")))
 
+
 capture.output(get_variables_importance(myBiomodModelOut),
                file=file.path(paste0("./Araucaria/outputs/formal_models_variables_importance.txt", sep="")))
 
@@ -822,10 +775,10 @@ myBiomodEM <- BIOMOD_EnsembleModeling (modeling.output= myBiomodModelOut,
                                                         get_built_models(myBiomodModelOut),
                                                     value=TRUE),
                                        #chosen.models='all',
-                                       #em.by="all", #Statistical models : 'algo'
-                                       em.by="PA_dataset+repet", #see why here https://rstudio-pubs-static.s3.amazonaws.com/38564_747d4bbf87704f0394734977bd4905c4.html
+                                       em.by="all", #Statistical models : 'algo'
+                                       #em.by="PA_dataset+repet", #see why here https://rstudio-pubs-static.s3.amazonaws.com/38564_747d4bbf87704f0394734977bd4905c4.html
                                        eval.metric= c("ROC"),
-                                       eval.metric.quality.threshold= c(0.7),#Setting threshold for cutoff between models, at least 2 models higher
+                                       eval.metric.quality.threshold= c(0.6),#Setting threshold for cutoff between models, at least 2 models higher
                                        models.eval.meth = c('TSS','ROC'),
                                        prob.mean=FALSE,
                                        prob.ci=FALSE,
@@ -869,7 +822,7 @@ BiomodEF <- get(load(paste0("./Araucaria/proj_current/Araucaria.current.ensemble
 
 mod <- c("gs","he","no") # For global climate models (GCMs): NorESM1-M, HadGEM2-ES, GISS-E2-R,  
 rcp <- c("45","85") #  for RCP 45 and 85
-yr <- c("2080") # For 2080
+yr <- c("2080") # For 2050, 2080
 
 n.mod <- length(mod)*length(rcp)*length(yr)
 
@@ -886,9 +839,8 @@ n.mod <- length(mod)*length(rcp)*length(yr)
         ## Load climatic data
         setwd("./Bioclim_futuro/future_bioclim/future_data_3")
         future <- stack(paste0(mod[mc],"_",rcp[j],"_",yr[l],".tif"))
-        names(future) <- c("bio01","bio04","bio11","bio12")
-        #future <- stack(predictors_good_1$altitude,future)
-        future <- stack(predictors_after_prean$remnant,future)
+        names(future) <- c("bio01","bio02","bio04","bio12")
+        #future <- stack(predictos_after_prean$altitude,future)
         myExplfut <- future
         # Avoiding Maxent warnings Status1
         intersect_mask <- function(x){
@@ -918,7 +870,7 @@ n.mod <- length(mod)*length(rcp)*length(yr)
                                               on_0_1000=TRUE,
                                               output.format=".grd")
         
-        ## BIOMOD_EnsembleForecasting == FUTURE == ## Ensemble forecasting
+        ## BIOMOD_EnsembleForecasting == FUTURE ==
         BiomodEF_Future <- BIOMOD_EnsembleForecasting(EM.output=myBiomodEM, ## Rules for assembling
                                                       projection.output=BiomodProjFuture, ## Individual model projection
                                                       binary.meth=c('TSS','ROC'),
@@ -936,12 +888,12 @@ n.mod <- length(mod)*length(rcp)*length(yr)
 ## Current distribution
 ## Presence points and altitude
 # Legend specifications
-a.arg <- list(at=seq(0,2000,length.out=5),labels=seq(0,2000,length.out=5),cex.axis=1.5)
-l.arg <- list(text="Elevation (m)",side=2, line=0.5, cex=2.5)
+a.arg <- list(at=seq(0,2000,length.out=5),labels=seq(0,2000,length.out=5),cex.axis=1.0)
+l.arg <- list(text="Elevation (m)",side=2, line=0.5, cex=1.5)
 # Plot
 pdf(paste0("./Araucaria/outputs/presence_alt.pdf"),width=6.5,height=10)
-par(mar=c(0,0,0,1),cex=1.4)
-plot(predictors_after_prean$altitude,col=terrain.colors(255)[255:1],
+#par(mar=c(0,0,0,1),cex=1.4)
+plot(myExpl2$altitude,col=viridis_pal(option = "B")(255)[255:1],
      legend.width=1.5,legend.shrink=0.6,legend.mar=7,
      axis.args=a.arg,legend.arg=l.arg,
      axes=FALSE,box=FALSE,zlim=c(0,2000))
@@ -960,18 +912,26 @@ breakpoints <- c(-100,100,300,500,700,900,1100)
 #colors <- c(grey(seq(0.9,0.7,-0.2)),gcolors(3))
 a.arg <- list(at=seq(0,1000,length.out=6), labels=c("0","1","2","3","4","5"),cex.axis=1.5)
 l.arg <- list(text="Vote",side=2, line=0.5, cex=1.5)
-colors <- c(grey(c(0.90,seq(0.7,0.3,-0.2))),"#568203","#013220")
+#colors <- c(grey(c(0.90,seq(0.7,0.3,-0.2))),"#568203","#013220")
 
 ###############################
 
 # Plot
-pdf(paste0("./Araucaria/outputs/ca_current.pdf"),width=6.5,height=10)
+pdf(paste0("./Araucaria/outputs/ca_current1.pdf"),width=6.5,height=10)
 par(mar=c(0,0,0,1),cex=1.4)
-plot(ca,col=viridis_pal(option = "B")(7),ext=mascara_2, breaks=breakpoints,
+plot(ca,col=viridis_pal(option = "D")(7)[7:1],ext=mascara_2, breaks=breakpoints,
 #plot(ca,col=colors,ext=mascara_2, breaks=breakpoints,
       legend.width=1.5,legend.shrink=0.6,legend.mar=7,
      axis.args=a.arg,legend.arg=l.arg,
      axes=FALSE, box=FALSE, zlim=c(0,1000))
+#plot(mascara, add=T, col="transparent",border="black")
+#plot(mascarafim, add=T, col="transparent",border="black")
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(wrld_simpl, add=TRUE)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
 dev.off()
 
 # Export as tif
@@ -992,24 +952,25 @@ writeRaster(binary_map_current, filename = paste0("./Araucaria/outputs/binary_cu
 
 ## Present species distribution area (km2)
 ## values(ca)>=500 gives vote >=2
+
 SDA.pres <- sum(values(ca)>=600,na.rm=TRUE) # Just the sum because one pixel is 1km2.
 compare_with_SDA.pres <- sum(values(binary_map_current)>0,na.rm=TRUE) ## it works ;)
 
 ## Present species distribution area (km2) - accordingly to continuous distribution
-raster <- ca
-
-oi <- as.data.frame(raster$Araucaria_EMcaByROC_mergedAlgo_Full_PA1)
-colnames(oi)<-"media"
-projection(raster) = CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
-rst_prj <- projectRaster(raster, crs = "+init=epsg:32722")
-spy_prj <- rasterToPolygons(rst_prj)
+#raster <- ca
+#
+##oi <- as.data.frame(raster$Araucaria_EMcaByTSS_mergedAlgo_mergedRun_mergedData)
+#colnames(oi)<-"media"
+#projection(raster) = CRS("+proj=longlat +datum=WGS84 +no_defs")
+#rst_prj <- projectRaster(raster, crs = "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+#spy_prj <- rasterToPolygons(rst_prj)
 
 ## Present species distribution area (km2)
-unique(values(ca))
-library(rgeos)
-ta  <- gArea(spy_prj)/1e6 # total area = 217.849,2
-percentual_pres <- SDA.pres*100/ta # ta = total area of MOF  24,49
-km2_pres <- (ta*percentual_pres)/100
+#unique(values(ca)
+#library(rgeos)
+#ta  <- gArea(spy_prj)/1e6 # total area = 217.849,2
+#percentual_pres <- SDA.pres*100/ta # ta = total area of MOF  24,49
+#km2_pres <- (ta*percentual_pres)/100
 
 ##=================
 ## Ecological niche
@@ -1017,8 +978,7 @@ km2_pres <- (ta*percentual_pres)/100
 ## 95% quantiles for alt, temp, prec, tseas, cwd
 wC <- which(values(ca)>=600)
 niche.df <- as.data.frame(myExpl)[wC,]
-niche.df$alt <- predictors_good_1$altitude[wC]
-#niche.df$alt <- predictors_good_1$altitude[wC]
+niche.df$alt <- myExpl2$altitude[wC]
 
 Mean <- round(apply(niche.df,2,mean,na.rm=TRUE))
 q <- round(apply(niche.df,2,quantile,c(0.025,0.975),na.rm=TRUE))
@@ -1039,6 +999,10 @@ write.csv2(mapmat.df,paste0("./Araucaria/outputs/niche_graph_species.csv"))
 
 (scores_all <- get_evaluations(myBiomodModelOut))
 scores_ROC <- as.numeric(scores_all["ROC","Testing.data",,,])
+scores_ROC <- as.data.frame(scores_ROC)
+scores_ROC <- scores_ROC[complete.cases(scores_ROC$scores_ROC), ] 
+mean(scores_RO)
+mean(scores_ROC$scores_ROC)
 scores_TSS <- as.numeric(scores_all["TSS","Testing.data",,,])
 mean(scores_ROC)
 ## select a threshold to keep a single model
@@ -1112,19 +1076,6 @@ round_data_frame <- function(x, digits=0) {
 Perf.ca <- accuracy_indices(pred=PredData,obs=ObsData,digits=3)
 write.table(Perf.ca,paste0("./Araucaria/outputs/performance_ca.txt"),sep="\t")
 
-# Committee averaging performance
-#Index <- c("ROC","ACCURACY","TSS","KAPPA")
-#Perf.ca <- data.frame(ROC=NA,OA=NA,TSS=NA,K=NA,Sen=NA,Spe=NA)
-#for (ind in 1:length(Index)) {
- # v <- Find.Optim.Stat(Stat=Index[ind],Fit=caData,Obs=ObsData,Fixed.thresh=800) 
-  # https://rdrr.io/cran/biomod2/man/Find.Optim.Stat.html! 
-  ## here thresh=600: three models at least
-  #Perf.ca[,ind] <- v[1]
-#}
-#Perf.ca$Sen <- v[3]
-#Perf.ca$Spe <- v[4]
-#write.table(Perf.ca,paste0("./Araucaria/outputs/performance_ca.txt"),sep="\t")
-
 ## Variable importance
 VarImp <- as.data.frame(get_variables_importance(myBiomodModelOut)[,,"Full","PA1"])
 Rank <- as.data.frame(apply(-VarImp,2,rank))
@@ -1159,6 +1110,7 @@ Alt.fut <- data.frame(mean.pres=niche$alt[1],q1.pres=niche$alt[2],q2.pres=niche$
 for (j in 1:length(rcp)) {
   for (l in 1:length(yr)) {
     # Create stack of model predictions
+     setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
       caS <- stack() 
       for (mc in 1:length(mod)) {
       name.f <- paste0("proj_",mod[mc],"_",rcp[j],"_",yr[l])
@@ -1174,16 +1126,21 @@ for (j in 1:length(rcp)) {
     l.arg <- list(text="Vote",side=2, line=0.5, cex=1.5)
 
     # Plot (Committee Averaging Full Dispersal)
-    pdf(paste0("./Araucaria/outputs/cafd_",rcp[j],"_",yr[l],".pdf"),width=6.5,height=10)
-    par(mar=c(0,0,0,1),cex=1.4)
+    pdf(paste0("./Araucaria/outputs/cafd_",rcp[j],"_",yr[l],"2.pdf"),width=6.5,height=10)
+    #par(mar=c(0,0,0,1),cex=1.4)
     plot(caFut,col= viridis_pal(option = "B")(16),
          breaks=breakpoints,ext=mascara_2,
          legend.width=1.5,legend.shrink=0.75,legend.mar=7,
          axis.args=a.arg,legend.arg=l.arg,
          axes=FALSE,box=FALSE,zlim=c(0,3000))
-    plot(estados[estados$Regiao=="SUL",], add=T,col="transparent")
+    #plot(mascara, add=T, col="transparent",border="black")
+    #plot(mascarafim, add=T, col="transparent",border="black")
+    plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+    plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+    plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+    #plot(wrld_simpl, add=TRUE)
     dev.off()
-    writeRaster(caFut, filename = paste0("./Araucaria/outputs/",rcp[j],"_",yr[l],"_caFD"), format = "GTiff", overwrite = TRUE)
+    writeRaster(caFut, filename = paste0("./Araucaria/outputs/",rcp[j],"_",yr[l],"_caFD_plos"), format = "GTiff", overwrite = TRUE)
     
     ## Convert the map to binary in order to compute connectivity
     binary_map_fut_caFut <- BinaryTransformation(caFut, 1599) # at least 6 models, 1500 counts 7 at least, that's why 1499
@@ -1192,16 +1149,23 @@ for (j in 1:length(rcp)) {
 
     # Zero-dispersal
     caZD <- caFut
+    projection(caZD) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
     values(caZD)[values(ca)<600] <- 0 
-    pdf(paste0("./Araucaria/outputs/cazd_",rcp[j],"_",yr[l],".pdf"),width=6.5,height=10)
-    par(mar=c(0,0,0,1),cex=1.4)
+    pdf(paste0("./Araucaria/outputs/cazd_",rcp[j],"_",yr[l],"_2.pdf"),width=6.5,height=10)
+    #par(mar=c(0,0,0,1),cex=1.4)
     plot(caZD,col=viridis_pal(option = "B")(16),
          breaks=breakpoints,ext=mascara_2,
          legend.width=1.5,legend.shrink=0.75,legend.mar=7,
          axis.args=a.arg,legend.arg=l.arg,
          axes=FALSE,box=FALSE,zlim=c(0,3000))
-    plot(estados[estados$Regiao=="SUL",], add=T,col="transparent")
+    #plot(mascara, add=T, col="transparent",border="black")
+    #plot(mascarafim, add=T, col="transparent",border="black")
+    plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+    plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+    plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+    #plot(wrld_simpl, add=TRUE)    
     dev.off()
+    
     # convert the caZD to raster file to calculate the amount of PA over each projected scenario
     writeRaster(caZD, filename = paste0("./Araucaria/outputs/",
                                          rcp[j],"_",yr[l],"_caZD"), format = "GTiff", overwrite = TRUE)
@@ -1219,15 +1183,15 @@ for (j in 1:length(rcp)) {
     # Altitude
     # fd
     if (SDA.fut$area.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="full"] != 0) {
-      Alt.fut$mean.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="full"] <- mean(values(predictors_good_1$altitude)[values(caFut)>=1600],na.rm=TRUE)
-      Alt.fut$q1.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="full"] <- quantile(values(predictors_good_1$altitude)[values(caFut)>=1600],0.025,na.rm=TRUE)
-      Alt.fut$q2.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="full"] <- quantile(values(predictors_good_1$altitude)[values(caFut)>=1600],0.975,na.rm=TRUE)
+      Alt.fut$mean.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="full"] <- mean(values(predictos_after_prean$altitude)[values(caFut)>=1600],na.rm=TRUE)
+      Alt.fut$q1.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="full"] <- quantile(values(predictos_after_prean$altitude)[values(caFut)>=1600],0.025,na.rm=TRUE)
+      Alt.fut$q2.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="full"] <- quantile(values(predictos_after_prean$altitude)[values(caFut)>=1600],0.975,na.rm=TRUE)
         }
     # zd
     if (SDA.fut$area.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="zero"] != 0) {
-      Alt.fut$mean.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="zero"] <- mean(values(predictors_good_1$altitude)[values(caZD)>=1600],na.rm=TRUE)
-      Alt.fut$q1.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="zero"] <- quantile(values(predictors_good_1$altitude)[values(caZD)>=1600],0.025,na.rm=TRUE)
-      Alt.fut$q2.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="zero"] <- quantile(values(predictors_good_1$altitude)[values(caZD)>=1600],0.975,na.rm=TRUE)
+      Alt.fut$mean.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="zero"] <- mean(values(predictos_after_prean$altitude)[values(caZD)>=1600],na.rm=TRUE)
+      Alt.fut$q1.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="zero"] <- quantile(values(predictos_after_prean$altitude)[values(caZD)>=1600],0.025,na.rm=TRUE)
+      Alt.fut$q2.fut[SDA.fut$rcp==rcp[j] & SDA.fut$yr==yr[l] & SDA.fut$disp=="zero"] <- quantile(values(predictos_after_prean$altitude)[values(caZD)>=1600],0.975,na.rm=TRUE)
           }
         }
       }
@@ -1244,6 +1208,7 @@ write.table(Alt.fut,paste0("./Araucaria/outputs/Araucaria_alt_fut.txt"),sep="\t"
 ## Save main objects
 save(list=c("SDA.fut","Alt.fut","niche","Perf.mods","VarImp"),file=paste0("./Araucaria/outputs/main_obj.rda"))
 
+}
 
 # end of first step - Modeling Araucaria potential distribution
 
@@ -1261,12 +1226,16 @@ projection(ucs) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs8
 ucs_suste <- readOGR("./unidade_uso_sustentavelPolygon.shp") 
 #Define proper CRS
 projection(ucs_suste) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+#"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+#+proj=longlat +datum=WGS84 +no_defs (to use above)
 
 # combine both spdf
-ucs_full <- rbind(ucs,ucs_suste)
+ucs_full_2 <- rbind(ucs,ucs_suste)
 # crop it for study area
-ucs_full <- crop(ucs_full,mascara)
-ucs_suste1 <- crop(ucs_suste,mascara)
+ucs_ucs_fim <- crop(ucs_full_2,mascarateste2)
+projection(ucs_ucs_fim) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+plot(ucs_ucs_fim, add=T, col="green")
+
 
 #install.packages("ConR")
 library(ConR)
@@ -1307,10 +1276,13 @@ samplocs <- xyFromCell(object, samp)
 samplocs_ca <- xyFromCell(object_ca, samp_ca)
 
 # convert to a data frame
+library(dplyr)
 samp <- as.data.frame(cbind(samplocs, samp, sampdata))
 names(samp) <- c('lon', 'lat', 'index', 'value')
+samp <- samp %>% relocate(lat, lon, index,value)
 samp_ca <- as.data.frame(cbind(samplocs_ca, samp_ca, sampdata_ca))
 names(samp_ca) <- c('lon', 'lat', 'index', 'value')
+samp_ca <- samp_ca %>% relocate(lat, lon, index,value)
 
 # and optionally, a spatial object, in sf or sp
 samp_sp <- samp
@@ -1330,11 +1302,12 @@ samp$higher.tax.rank <- rep(c("Araucariaceae"))
 samp_ca$higher.tax.rank <- rep(c("Araucariaceae"))
 samp <- samp[,-3] # twice
 samp <- samp[,-3] # twice
-samp <- samp[,c(2,1,3,4)]
-
+#samp <- samp[,c(2,1,3,4)]
+samp <- samp %>% rename(ddlat=lat, ddlon=lon,tax=tax,family=higher.tax.rank)
 samp_ca <- samp_ca[,-3] # twice
 samp_ca <- samp_ca[,-3] # twice
-samp_ca <- samp_ca[,c(2,1,3,4)]
+samp_ca <- samp_ca %>% rename(ddlat=lat, ddlon=lon,tax=tax,family=higher.tax.rank)
+#samp_ca <- samp_ca[,c(2,1,3,4)]
 
 write.csv(samp,paste0("./Araucaria/outputs/",
                        rcp[j],"_",yrs[m],"_",disp[k],"samp_conR.csv"))
@@ -1351,7 +1324,8 @@ conRtable <- conRtable[,-1]
 MyData_samp <- conRtable
 mapa_pa_samp <- IUCN.eval(MyData_samp, Cell_size_locations = 10, 
                          protec.areas = ucs_full, ID_shape_PA = "nome", 
-                         method_protected_area = "no_more_than_one", DrawMap = T,write_shp = T)
+                         method_protected_area = "no_more_than_one",
+                         DrawMap = T,write_shp = F)
 
 write.csv(mapa_pa_samp,paste0("./Araucaria/outputs/",
                                       rcp[j],"_",yrs[m],"_",disp[k],"_inPA.csv"))
@@ -1365,7 +1339,8 @@ conRtable_current <- conRtable_current[,-1]
 MyData_samp_current <- conRtable_current
 mapa_pa_samp_current <- IUCN.eval(MyData_samp_current, Cell_size_locations = 1, 
                                   protec.areas = ucs_full, ID_shape_PA = "nome", 
-                                  method_protected_area = "no_more_than_one", DrawMap = T,write_shp = T)
+                                  method_protected_area = "no_more_than_one",
+                                  DrawMap = T,write_shp = T)
 
 write.csv(mapa_pa_samp_current,paste0("./Araucaria/outputs/currentinPA.csv"))
 
@@ -1388,14 +1363,14 @@ SDA.current <- sum(values(connect_cur)>=1,na.rm=TRUE)
 bb_future <- bbox(connect) #fornece uma caixa delimitadora
 bb_current <- bbox(connect_cur) #fornece uma caixa delimitadora
 
-cs <- c(0.1, 0.1)  # cell size 
+cs <- c(0.15, 0.15)  # cell size 
 cc_future <- bb_future[, 1] + (cs/2)  # cell offset
 cc_current <- bb_current[, 1] + (cs/2)  # cell offset
 
 dd_future <- ceiling(diff(t(bb_future))/cs)  # number of cells per direction - transforma argumento em vetor
 dd_current <- ceiling(diff(t(bb_current))/cs)  # number of cells per direction - transforma argumento em vetor
 
-grd_future<- GridTopology(cellcentre.offset=cc_future, cellsize=cs, cells.dim=dd_future)
+grd_future <- GridTopology(cellcentre.offset=cc_future, cellsize=cs, cells.dim=dd_future)
 grd_current <- GridTopology(cellcentre.offset=cc_current, cellsize=cs, cells.dim=dd_current)
 
 ## Conversion from topology to poligon (shape)
@@ -1410,14 +1385,17 @@ sp_grd_current <- as(sp_grd_current, "SpatialPolygons")
 
 # set CRS
 
-proj4string(sp_grd_future) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 " 
-proj4string(sp_grd_current) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 "
-
+proj4string(sp_grd_future) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
+proj4string(sp_grd_current) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+ 
 names(connect)<- "binary"
 names(connect_cur)<- "binary"
 
 shp_future <- rasterToPolygons(connect, fun=function(x){x>0})
 shp_current<- rasterToPolygons(connect_cur, fun=function(x){x>0})
+
+proj4string(shp_future) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+proj4string(shp_current) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 over_future <- over(sp_grd_future, shp_future) # gathering ucs points 
 over_current <- over(sp_grd_current, shp_current) # gathering ucs points 
@@ -1449,10 +1427,9 @@ x_future <- as.matrix(df_coords_future[,2:3])
 x_current <- as.matrix(df_coords_current[,2:3])
 
 library(spatgraphs)
-g_future <- spatgraph(x_future, "geometric", par=0.2) 
-g_current <- spatgraph(x_current, "geometric", par=0.2) 
+g_future <- spatgraph(x_future, "geometric", par=0.15) 
+g_current <- spatgraph(x_current, "geometric", par=0.15) 
 
-#g_futurw <- spatgraph(x_future, "geometric", par=0.15)
 
 # Legend
 breakpoints <- seq(-1,1,by=1)
@@ -1460,10 +1437,10 @@ breakpoints <- seq(-1,1,by=1)
 a.arg <- list(at=seq(-1,1,length.out=3), labels=c(-1,0,1), cex.axis=1.2)
 l.arg <- list(text="Presence/Absence",side=2, line=0.5, cex=1.5)
 
-# Plot (Future connectiviy)
+# Plot (Future connectiviy
 pdf(paste0("./Araucaria/outputs/connectivity_",rcp[j],"_",yrs[m],"_",
-           dispersal[q],".pdf"),width=6.5,height=10)
-par(mar=c(0,0,0,1),cex=1.4)
+           dispersal[q],".pdf"),width=14,height=10)
+#par(mar=c(0,0,0,1),cex=1.4)
 plot(connect,col= viridis_pal(option = "B")(3),breaks=breakpoints,ext=mascara_2,
      legend.width=1.5,legend.shrink=0.6,legend.mar=7,
      axis.args=a.arg,legend.arg=l.arg,
@@ -1471,12 +1448,22 @@ plot(connect,col= viridis_pal(option = "B")(3),breaks=breakpoints,ext=mascara_2,
 points(df_coords_future$lonDD, df_coords_future$latDD, col="white", pch=20)
 plot(g_future,x_future, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
      add=T, col="white")
-#plot(ucs_full, add=T, col= "transparent", border="blue")#not too bad
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c(paste0("Future distribution RCP ", 
+                          rcp[j]," ",dispersal[q]," 2085"),
+                          "Tropic of Capricorn - Dashed Line",
+                          "Future connectivity"),
+       col=c("black","black","black"),
+       fill=c("#BB3754FF","black","white"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
 dev.off()
 
 # Plot (Future connectiviy)
-pdf(paste0("./Araucaria/outputs/cur_connectivity1.pdf"),width=6.5,height=10)
-par(mar=c(0,0,0,1),cex=1.4)
+pdf(paste0("./Araucaria/outputs/cur_connectivity1.pdf"),width=14,height=10)
 plot(connect_cur,col= viridis_pal(option = "B")(3),breaks=breakpoints,ext=mascara_2,
      legend.width=1.5,legend.shrink=0.6,legend.mar=7,
      axis.args=a.arg,legend.arg=l.arg,
@@ -1484,8 +1471,19 @@ plot(connect_cur,col= viridis_pal(option = "B")(3),breaks=breakpoints,ext=mascar
 points(df_coords_current$lonDD, df_coords_current$latDD, col="white", pch=20)
 plot(g_current,x_current, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
      add=T, col="white")
-
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Current binary distribution",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Current connectivity N=732"),
+       col=c("black","black","black"),
+       fill=c("#BB3754FF","black","white"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
 dev.off()
+
 
 ## Table to compare connectivity 
 
@@ -1494,6 +1492,7 @@ table_current <- sum(sapply(g_current$edges, length)>0)
 write.table(table_fut,paste0("./Araucaria/outputs/", dispersal[q],"_",rcp[j],"_",yrs[m],"Araucaria_connectivity.txt"),sep="\t")
 write.table(table_current,paste0("./Araucaria/outputs/Araucaria_current_connectivity.txt"),sep="\t")
 
+
         }
       }
     }
@@ -1501,13 +1500,887 @@ write.table(table_current,paste0("./Araucaria/outputs/Araucaria_current_connecti
 
 # Turn all the script
 }
+#install.packages("rnaturalearthdata")
+#library(rnaturalearthdata)
+
+##### testing Protected Areas above
 
 
+#### remove land-use change above presence/absence maps
+setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/Mapbiomas")
+
+#list.files(pattern=".tif")
+landuse <- raster("uso_do_solo_atual.tif")
+landuse <- resample(landuse,mascara_2,"bilinear")
+landuse <- crop (landuse, ex_2)
+landuse_fim <- mask(landuse,mascarateste2)
+
+# convert land-use areas where more than 30% were converted to agriculture and pasture
+
+binary_map_landuse <- BinaryTransformation(landuse_fim, 0.3) 
+plot(binary_map_landuse)
+
+planted_forests <- raster("florestas_plantadas.tif")
+planted_forests <- resample(planted_forests,mascara_2,"bilinear")
+planted_forests <- crop (planted_forests, ex_2)
+planted_forests <- mask(planted_forests,mascarateste2)
+plot(planted_forests)
+
+# convert planted-forests where at least 30% was converted to forests plantation
+binary_map_planted_forests <- BinaryTransformation(planted_forests, 0.3) 
+plot(binary_map_planted_forests)
+
+##### converted area
+antro_lands <- raster("areas_antropizadas.tif")
+antro_lands <- resample(antro_lands,mascara_2,"bilinear")
+antro_lands <- crop (antro_lands, ex_2)
+antro_lands <- mask(antro_lands,mascarateste2)
+
+##### converted area
+antro_lands <- resample(antro_lands,mascara_2,"bilinear")
+antro_lands <- crop (antro_lands, ex_2)
+antro_lands <- mask(antro_lands,mascarateste2)
+
+# convert antropic areas where at least 50% was converted to forests plantation
+binary_map_antro_lands <- BinaryTransformation(antro_lands, 0.5) 
+plot(binary_map_antro_lands)
+
+writeRaster(binary_map_landuse,('binary_land_use'), format = 'GTiff', overwrite=T)
+writeRaster(binary_map_planted_forests,('binary_planted_forest'), format = 'GTiff', overwrite=T)
+writeRaster(binary_map_antro_lands,('binary_antro_lands'), format = 'GTiff', overwrite=T)
+writeRaster(remnant_confut,('future_binary'), format = 'GTiff', overwrite=T)
+
+
+#o representa áreas de não uso do solo para agricultura e pastagem
+### setting land use above presence/absence maps
+setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1")
+
+### RCP 4.5 2080 - ZERO
+dados_finais_45_zero <- raster("./Mapbiomas/dados_finais_land_use_2080_Zero_45.tif")
+SDA.fut_land_use_45_zero <- sum(values(dados_finais_45_zero)>0,na.rm=TRUE) ## it works too ;)
+# Legend
+breakpoints <- seq(-2,1,by=1)
+a.arg <- list(at=seq(-2,1,length.out=4), labels=c("","","",""), 
+              cex.axis=1.2)
+l.arg <- list(text="Land-use / Absence / Presence",side=2, 
+              line=0.5, cex=1.5)
+# Plot (Future land=use 4.5 2080)
+pdf(paste0("./Araucaria/outputs/presence_absence_land_use_45_zero.pdf"),width=14,height=10)
+plot(dados_finais_45_zero,col= viridis_pal(option = "D")(4),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-2,1))
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Future binary distribution with land-use",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Land-use (agriculture,forest plantation,urban structure)"),
+       col=c("black","black","black"),
+       fill=c("#35B779FF","black","#440154FF"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+################
+#### Future 45 full
+dados_finais_45_full <- raster("./Mapbiomas/dados_finais_land_use_2080_Full_45.tif")
+SDA.fut_land_use <- sum(values(dados_finais)>0,na.rm=TRUE) ## it works too ;)
+plot(dados_finais)
+
+# Plot (Future land=use 4.5 2080)
+pdf(paste0("./Araucaria/outputs/presence_absence_land_use_45_Full.pdf"),width=14,height=10)
+plot(dados_finais_45_full,col= viridis_pal(option = "D")(4),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-2,1))
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Future binary distribution with land-use",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Land-use (agriculture,forest plantation,urban structure)"),
+       col=c("black","black","black"),
+       fill=c("#35B779FF","black","#440154FF"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+##### 85 full future
+### RCP 4.5 2080 - ZERO
+dados_finais_85_full <- raster("./Mapbiomas/dados_finais_land_use_2080_Full_85.tif")
+SDA.fut_land_use_55_full <- sum(values(dados_finais_85_full)>0,na.rm=TRUE) ## it works too ;)
+
+# Plot (Future land=use 4.5 2080)
+pdf(paste0("./Araucaria/outputs/presence_absence_land_use_dados_finais_85_full.pdf"),width=14,height=10)
+plot(dados_finais_85_full,col= viridis_pal(option = "D")(4),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-2,1))
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Future binary distribution with land-use",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Land-use (agriculture,forest plantation,urban structure)"),
+       col=c("black","black","black"),
+       fill=c("#35B779FF","black","#440154FF"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+##### 85 full future
+### RCP 4.5 2080 - ZERO
+dados_finais_85_zero <- raster("./Mapbiomas/dados_finais_land_use_2080_Zero_85.tif")
+SDA.fut_land_use_85_zero <- sum(values(dados_finais_85_zero)>0,na.rm=TRUE) ## it works too ;)
+
+# Plot (Future land=use 8.5 2080)
+pdf(paste0("./Araucaria/outputs/presence_absence_land_use_dados_finais_85_zero.pdf"),width=14,height=10)
+plot(dados_finais_85_zero,col= viridis_pal(option = "D")(4),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-2,1))
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Future binary distribution with land-use",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Land-use (agriculture,forest plantation,urban structure)"),
+       col=c("black","black","black"),
+       fill=c("#35B779FF","black","#440154FF"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+########### current distribution
+remnant_concur <- raster("./Araucaria/outputs/binary_current.tif")
+dados_finais_current <- raster("./Mapbiomas/dados_finais_land_use_current.tif")
+
+# Plot (Current distribution land-use)
+pdf(paste0("./Araucaria/outputs/presence_absence_land_use_current.pdf"),width=14,height=10)
+plot(dados_finais_current,col= viridis_pal(option = "D")(4),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-2,1))
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Current binary distribution",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Land-use (agriculture,forest plantation,urban structure)"),
+       col=c("black","black","black"),
+       fill=c("#35B779FF","black","#440154FF"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+# importar os arquivos no formato rasterstack
+
+#### create table and compare habitat loss due to land-use
+
+## No land-use
+
+binary_45_Full <- raster("./Araucaria/outputs/45_binary_2080_Full.tif")
+binary_45_Zero <- raster("./Araucaria/outputs/45_binary_2080_Zero.tif")
+binary_85_Full <- raster("./Araucaria/outputs/85_binary_2080_Full.tif")
+binary_85_Zero <- raster("./Araucaria/outputs/85_binary_2080_Zero.tif")
+binary_current <- raster("./Araucaria/outputs/binary_current.tif")
+
+# Calculate suitable climatic areas
+binary_45_Full_area <- sum(values(binary_45_Full)>0,na.rm=TRUE)
+binary_45_Zero_area <- sum(values(binary_45_Zero)>0,na.rm=TRUE)
+binary_85_Full_area <- sum(values(binary_85_Full)>0,na.rm=TRUE)
+binary_85_Zero_area <- sum(values(binary_85_Zero)>0,na.rm=TRUE)
+binary_current_area <- sum(values(binary_current)>0,na.rm=TRUE) ## it works too ;)
+
+table_binary_area_land_use <- c(47683,47558,15767,15766,135468)
+table_binary_area_scenario <- c("binary_45_Full_area","binary_45_Zero_area",
+                                "binary_85_Full_area","binary_85_Zero_area",
+                                "binary_current_area")
+table_binary_area <- as.data.frame(table_binary_area,table_binary_area_scenario)
+
+## Calculate suitable climatic areas with land-use
+binary_45_Full_area_land_use <- sum(values(dados_finais_45_full)>0,na.rm=TRUE)
+binary_45_Zero_area_land_use <- sum(values(dados_finais_45_zero)>0,na.rm=TRUE)
+binary_85_Full_area_land_use <- sum(values(dados_finais_85_full)>0,na.rm=TRUE)
+binary_85_Zero_area_land_use <- sum(values(dados_finais_85_zero)>0,na.rm=TRUE)
+binary_current_area_land_use <- sum(values(dados_finais_current)>0,na.rm=TRUE) 
+
+table_binary_area_land_use <- c(36365,36240,11993,11993,108174)
+table_binary_area_scenario_land_use <- c("binary_45_Full_area_land_use",
+                                "binary_45_Zero_area_land_use",
+                                "binary_85_Full_area_land_use",
+                                "binary_85_Zero_area_land_use",
+                                "binary_current_area")
+
+table_binary_area <- as.data.frame(table_binary_area,table_binary_area_scenario)
+
+table_binary_area_land_use2 <- cbind(table_binary_area,
+                                    table_binary_area_land_use)
+
+table_binary_area_land_use2$perc.change <- round(100*((table_binary_area_land_use2$table_binary_area_land_use-table_binary_area_land_use2$table_binary_area)/binary_current_area))
+
+write.csv2(table_binary_area_land_use2,paste0("./Araucaria/outputs/land_use_suitable_area_loss.csv"))
+
+##########################
+
+rcp <- c("45","85")
+dispersal <- c("Full","Zero")
+
+for (j in 1: length(rcp)) {
+      for (q in 1: length(dispersal)) {
+## PLOT CONNECTIVITY WITH LAND-USE
+
+### Connectivity among predicted occurrence areas
+
+land_use_future <- raster(paste0("./Mapbiomas/dados_finais_land_use_2080_",dispersal[q],"_",rcp[j],".tif"))
+
+### Create a matrix from rasters
+matrix_connect_land_use <- as.matrix(land_use_future)  # future data (ensemble all)
+
+SDA.future_land_use <- sum(values(land_use_future)>0,na.rm=TRUE) # dá na mesma se colocar >=1
+
+bb_future_land_use <- bbox(land_use_future) #fornece uma caixa delimitadora
+
+cs <- c(0.15, 0.15)  # cell size 
+cc_future_land_use <- bb_future_land_use[, 1] + (cs/2)  # cell offset
+
+dd_future_land_use <- ceiling(diff(t(bb_future_land_use))/cs)  # number of cells per direction - transforma argumento em vetor
+
+grd_future_land_use <- GridTopology(cellcentre.offset=cc_future_land_use, cellsize=cs, cells.dim=dd_future_land_use)
+
+## Conversion from topology to poligon (shape)
+sp_grd_future_land_use <- SpatialGridDataFrame(grd_future_land_use,
+                                               data=data.frame(id=1:prod(dd_future_land_use)))
+
+sp_grd_future_land_use <- as(sp_grd_future_land_use, "SpatialPixels")
+
+sp_grd_future_land_use <- as(sp_grd_future_land_use, "SpatialPolygons")
+
+# set CRS
+
+proj4string(sp_grd_future_land_use) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
+
+names(land_use_future)<- "binary"
+
+shp_future_land_use <- rasterToPolygons(land_use_future, fun=function(x){x>0})
+
+proj4string(shp_future_land_use) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+over_future_land_use <- over(sp_grd_future_land_use, shp_future_land_use) # gathering ucs points 
+
+sp_grd_grdDF_future_land_use <- SpatialGridDataFrame(grd_future_land_use, data=data.frame(id=1:prod(dd_future_land_use)))
+
+sp_grd_coord_future_land_use <- as(sp_grd_grdDF_future_land_use, "SpatialPixels")
+
+sp_grd_coord_DF_future_land_use <- as.data.frame(sp_grd_coord_future_land_use)
+
+df_coords_future_land_use <- data.frame(over_future_land_use, sp_grd_coord_DF_future_land_use)
+
+names(df_coords_future_land_use)<-c("binary", "lonDD", "latDD")
+
+df_coords_future_land_use <-subset(df_coords_future_land_use, binary == 1)
+
+# creating graphs using k-nearest neighbours
+
+x_future_land_use <- as.matrix(df_coords_future_land_use[,2:3])
+
+library(spatgraphs)
+g_future_land_use <- spatgraph(x_future_land_use, "geometric", par=0.15) 
+
+## Table to compare connectivity 
+
+table_fut_land_use <- sum(sapply(g_future_land_use$edges, length)>0)
+write.table(table_fut_land_use,paste0("./Araucaria/outputs/", dispersal[q],"_",rcp[j],"_",yrs[m],"Araucaria_connectivity_table_fut_land_use.txt"),sep="\t")
+     
+# use brackets here to create only the table
+
+# Legend
+breakpoints <- seq(-1,1,by=1)
+a.arg <- list(at=seq(-1,1,length.out=3), labels=c("","",""), cex.axis=1.2)
+l.arg <- list(text="Absence / Presence",side=2, line=0.5, cex=1.5)
+
+# Plot (Future connectiviy
+pdf(paste0("./Araucaria/outputs/connectivity_land_use_",rcp[j],"_",yrs[m],"_",
+           dispersal[q],".pdf"),width=14,height=10)
+
+plot(land_use_future,col= viridis_pal(option = "B")(3),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-1,1))
+points(df_coords_future_land_use$lonDD, df_coords_future_land_use$latDD, 
+       col="white", pch=20)
+plot(g_future_land_use,x_future_land_use, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
+     add=T, col="white")
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c(paste0("Future distribution RCP ", 
+                                 rcp[j]," ",dispersal[q]," 2085"),
+                          "Tropic of Capricorn - Dashed Line",
+                          "Future connectivity with land-use"),
+       col=c("black","black","black"),
+       fill=c("#BB3754FF","black","white"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+      }
+  }
+
+
+### Connectivity among predicted occurrence areas
+
+land_use_current <- raster("./Mapbiomas/dados_finais_land_use_current.tif")
+
+### Create a matrix from rasters
+matrix_connect_cur_land_use <- as.matrix(land_use_current)
+
+SDA.current_land_use <- sum(values(land_use_current)>=1,na.rm=TRUE)
+
+bb_current_land_use <- bbox(land_use_current) #fornece uma caixa delimitadora
+
+cs <- c(0.15, 0.15)  # cell size 
+cc_current_land_use <- bb_current_land_use[, 1] + (cs/2)  # cell offset
+
+dd_current_land_use <- ceiling(diff(t(bb_current_land_use))/cs)  # number of cells per direction - transforma argumento em vetor
+
+grd_current_land_use <- GridTopology(cellcentre.offset=cc_current_land_use, cellsize=cs, cells.dim=dd_current_land_use)
+
+## Conversion from topology to poligon (shape)
+sp_grd_current_land_use <- SpatialGridDataFrame(grd_current_land_use, 
+                                                data=data.frame(id=1:prod(dd_current_land_use)))                        
+
+sp_grd_current_land_use <- as(sp_grd_current_land_use, "SpatialPixels")                                       
+
+sp_grd_current_land_use <- as(sp_grd_current_land_use, "SpatialPolygons")
+
+# set CRS
+
+proj4string(sp_grd_current_land_use) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+names(land_use_current)<- "binary"
+
+shp_current_land_use <- rasterToPolygons(land_use_current, fun=function(x){x>0})
+
+proj4string(shp_current_land_use) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+over_current_land_use <- over(sp_grd_current_land_use, shp_current_land_use) # gathering ucs points 
+
+sp_grd_grdDF_current_land_use <- SpatialGridDataFrame(grd_current_land_use, data=data.frame(id=1:prod(dd_current_land_use)))
+
+sp_grd_coord_current_land_use <- as(sp_grd_grdDF_current_land_use, "SpatialPixels")
+
+sp_grd_coord_DF_current_land_use <- as.data.frame(sp_grd_coord_current_land_use)
+
+df_coords_current_land_use <- data.frame(over_current_land_use, sp_grd_coord_DF_current_land_use)
+
+names(df_coords_current_land_use)<-c("binary", "lonDD", "latDD")
+
+df_coords_current_land_use <-subset(df_coords_current_land_use, binary == 1)
+
+
+# creating graphs using k-nearest neighbours
+
+x_current_land_use <- as.matrix(df_coords_current_land_use[,2:3])
+
+library(spatgraphs)
+g_current_land_use <- spatgraph(x_current_land_use, "geometric", par=0.15) 
+
+## Table to compare connectivity 
+# written within connectivity loop ;)
+
+# Legend
+breakpoints <- seq(-1,1,by=1)
+a.arg <- list(at=seq(-1,1,length.out=3), labels=c("","",""), cex.axis=1.2)
+l.arg <- list(text="Absence / Presence",side=2, line=0.5, cex=1.5)
+
+# Plot (Current connectiviy land_use)
+pdf(paste0("./Araucaria/outputs/current_connectivity_land_use.pdf"),width=14,height=10)
+
+plot(land_use_current,col= viridis_pal(option = "B")(3),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-1,1))
+points(df_coords_current_land_use$lonDD, df_coords_current_land_use$latDD, 
+       col="white", pch=20)
+plot(g_current_land_use,x_current_land_use, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
+     add=T, col="white")
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c(paste0("Current distribution with land-use"),
+                          "Tropic of Capricorn - Dashed Line",
+                          "Future connectivity with land-use"),
+       col=c("black","black","black"),
+       fill=c("#BB3754FF","black","white"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+table_current_land_use <- sum(sapply(g_current_land_use$edges, length)>0)
+write.table(table_current_land_use,paste0("./Araucaria/outputs/Araucaria_current_connectivity_table_current_land_use.txt"),sep="\t")
+
+############## New strategy Protected Areas
+
+
+binary_45_Full <- raster("./Araucaria/outputs/45_binary_2080_Full.tif")
+binary_45_Zero <- raster("./Araucaria/outputs/45_binary_2080_Zero.tif")
+binary_85_Full <- raster("./Araucaria/outputs/85_binary_2080_Full.tif")
+binary_85_Zero <- raster("./Araucaria/outputs/85_binary_2080_Zero.tif")
+binary_current <- raster("./Araucaria/outputs/binary_current.tif")
+
+
+#### Create rasters within the protected areas only 
+binary_45_Full_Ucs <- mask(dados_finais_45_full, ucs_ucs_fim)
+plot(binary_45_Full_Ucs)
+
+binary_45_Zero_Ucs <- mask(dados_finais_45_zero, ucs_ucs_fim)
+plot(binary_45_Zero_Ucs)
+
+binary_85_Full_Ucs <- mask(dados_finais_85_full, ucs_ucs_fim)
+plot(binary_85_Full_Ucs)
+
+binary_85_Zero_Ucs <- mask(dados_finais_85_zero, ucs_ucs_fim)
+plot(binary_85_Zero_Ucs)
+
+binary_current_Ucs <- mask(dados_finais_current, ucs_ucs_fim)
+plot(binary_current_Ucs)
+
+### save .tif rasters
+setwd("./outputs")
+writeRaster(binary_45_Full_Ucs, filename="./Araucaria/outputs/binary_45_Full_Ucs.tif", 
+            format='GTiff', overwrite=T)
+writeRaster(binary_45_Zero_Ucs, filename="./Araucaria/outputs/binary_45_Zero_Ucs.tif", 
+            format='GTiff', overwrite=T)
+writeRaster(binary_85_Full_Ucs, filename="./Araucaria/outputs/binary_85_Full_Ucs.tif", 
+            format='GTiff', overwrite=T)
+writeRaster(binary_85_Zero_Ucs, filename="./Araucaria/outputs/binary_85_Zero_Ucs.tif", 
+            format='GTiff', overwrite=T)
+writeRaster(binary_current_Ucs, filename="./Araucaria/outputs/binary_current_Ucs.tif", 
+            format='GTiff', overwrite=T)
+
+## Calculate suitable climatic areas with land-use
+binary_45_Full_Ucs_area <- sum(values(binary_45_Full_Ucs)>0,na.rm=TRUE)
+binary_45_Zero_Ucs_area <- sum(values(binary_45_Zero_Ucs)>0,na.rm=TRUE)
+binary_85_Full_Ucs_area <- sum(values(binary_85_Full_Ucs)>0,na.rm=TRUE)
+binary_85_Zero_Ucs_area <- sum(values(binary_85_Zero_Ucs)>0,na.rm=TRUE)
+binary_current_Ucs_area <- sum(values(binary_current_Ucs)>0,na.rm=TRUE) 
+
+table_binary_area_land_use_ucs <- c(2443,2361,1352,1352,7500)
+table_binary_area_scenario_land_use_ucs <- c("binary_45_Full_area_land_use_ucs",
+                                         "binary_45_Zero_area_land_use_ucs",
+                                         "binary_85_Full_area_land_use_ucs",
+                                         "binary_85_Zero_area_land_use_ucs",
+                                         "binary_current_area_ucs")
+table_binary_area_ucs <- as.data.frame(table_binary_area_land_use_ucs,
+                                       table_binary_area_scenario_land_use_ucs)
+
+table_binary_area_land_use_ucs_final <- cbind(table_binary_area_land_use2,
+                                              table_binary_area_ucs)
+
+
+table_binary_area_land_use_ucs_final$perc.change_ucs <- round(100*((table_binary_area_land_use_ucs_final$table_binary_area_land_use-table_binary_area_land_use_ucs_final$table_binary_area_land_use_ucs)/table_binary_area_land_use_ucs_final$table_binary_area_land_use)-100)
+
+## Atention, Im just tired to think, but this table give you a negative perc.change_ucs
+## in fact the result is the positive value. I fix it lates. Peace
+write.csv2(table_binary_area_land_use_ucs_final,paste0("./Araucaria/outputs/how_much_within_pa.csv"))
+
+
+### Plot the last figures of this article
+
+# Plot (Current final_figure land_use + pa within)
+pdf(paste0("./Araucaria/outputs/final_distribution_current_land_use_pa_within.pdf"),width=14,height=10)
+
+# Legend
+binary_current_teste <- BinaryTransformation(binary_current_Ucs, 0) #at least three models, 600 counts 3 at least
+crs(binary_current_teste) <- "+proj=longlat +datum=WGS84 +no_defs"
+crs(dados_finais_current) <- "+proj=longlat +datum=WGS84 +no_defs"
+crs(estados) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+breakpoints <- seq(-1,1,by=1)
+a.arg <- list(at=seq(-1,1,length.out=3), labels=c("","",""), cex.axis=1.2)
+l.arg <- list(text="Absence / Presence",side=2, line=0.5, cex=1.5)
+# Plot (Future land=use 4.5 2080)
+pdf(paste0("./Araucaria/outputs/current_land_use_distri_within_PA.pdf"),width=14,height=10)
+plot(dados_finais_current,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-1,1))
+plot(binary_current_teste,col=viridis_pal(option = "D",alpha = 0.8)(2),
+     axes=F,box=F,add=T,legend=F)
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Current distribution with land-use",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Current distribution within Protected Areas",
+                          "All Protected Areas contour"),
+       col=c("black","black","black","black"),
+       fill=c("#21908CFF","black","#FDE725CC","transparent"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+# Plot future scenarios
+
+# Legend
+binary_45_Full_Ucs_within <- BinaryTransformation(binary_45_Full_Ucs, 0) #at least three models, 600 counts 3 at least
+crs(binary_45_Full_Ucs_within) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+breakpoints <- seq(-1,1,by=1)
+a.arg <- list(at=seq(-1,1,length.out=3), labels=c("","",""), cex.axis=1.2)
+l.arg <- list(text="Absence / Presence",side=2, line=0.5, cex=1.5)
+# Plot (Future land=use 4.5 2080 Full)
+pdf(paste0("./Araucaria/outputs/future_full_45_land_use_distri_within_PA.pdf"),width=14,height=10)
+plot(dados_finais_45_full,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-1,1))
+plot(binary_45_Full_Ucs_within,col=viridis_pal(option = "D",alpha = 0.8)(2),
+     axes=F,box=F,add=T,legend=F)
+#plot(ucs_ucs_fim,col="transparent",contour="white",add=T)
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Future ocurrence with land-use (RCP 4.5 Full Dispersion 2085)",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Future occurrence within Protected Areas",
+                          "All Protected Areas contour"),
+       col=c("black","black","black","black"),
+       fill=c("#21908CFF","black","#FDE725CC","transparent"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+# Future 4.5 Zero 2085
+# Legend
+binary_45_Zero_Ucs_within <- BinaryTransformation(binary_45_Zero_Ucs, 0) #at least three models, 600 counts 3 at least
+crs(binary_45_Zero_Ucs_within) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+
+# Plot (Future land=use 4.5 2080 Zero)
+pdf(paste0("./Araucaria/outputs/future_zero_45_land_use_distri_within_PA.pdf"),width=14,height=10)
+plot(dados_finais_45_zero,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-1,1))
+plot(binary_45_Zero_Ucs_within,col=viridis_pal(option = "D",alpha = 0.8)(2),
+     axes=F,box=F,add=T,legend=F)
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Future ocurrence with land-use (RCP 4.5 Zero Dispersion 2085)",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Future occurrence within Protected Areas",
+                          "All Protected Areas contour"),
+       col=c("black","black","black","black"),
+       fill=c("#21908CFF","black","#FDE725CC","transparent"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+# Legend
+binary_85_Full_Ucs_within <- BinaryTransformation(binary_85_Full_Ucs, 0) #at least three models, 600 counts 3 at least
+crs(binary_85_Full_Ucs_within) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+
+# Plot (Future land=use 4.5 2080 Zero)
+pdf(paste0("./Araucaria/outputs/future_full_85_land_use_distri_within_PA.pdf"),width=14,height=10)
+plot(dados_finais_85_full,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-1,1))
+plot(binary_85_Full_Ucs_within,col=viridis_pal(option = "D",alpha = 0.8)(2),
+     axes=F,box=F,add=T,legend=F)
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Future ocurrence with land-use (RCP 8.5 Full Dispersion 2085)",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Future occurrence within Protected Areas",
+                          "All Protected Areas contour"),
+       col=c("black","black","black","black"),
+       fill=c("#21908CFF","black","#FDE725CC","transparent"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+# Legend
+binary_85_Zero_Ucs_within <- BinaryTransformation(binary_85_Zero_Ucs, 0) #at least three models, 600 counts 3 at least
+crs(binary_85_Zero_Ucs_within) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+
+# Plot (Future land=use 4.5 2080 Zero)
+pdf(paste0("./Araucaria/outputs/future_zero_85_land_use_distri_within_PA.pdf"),width=14,height=10)
+plot(dados_finais_85_zero,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-1,1))
+plot(binary_85_Zero_Ucs_within,col=viridis_pal(option = "D",alpha = 0.8)(2),
+     axes=F,box=F,add=T,legend=F)
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+#plot(ucs_full,add=T, col="transparent",contour="white")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Future ocurrence with land-use (RCP 8.5 Zero Dispersion 2085)",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Future occurrence within Protected Areas",
+                          "All Protected Areas contour"),
+       col=c("black","black","black","black"),
+       fill=c("#21908CFF","black","#FDE725CC","transparent"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
+
+##########################
+
+rcp <- c("45","85")
+dispersal <- c("Full","Zero")
+
+for (j in 1: length(rcp)) {
+  for (q in 1: length(dispersal)) {
+    ## PLOT CONNECTIVITY WITH LAND-USE
+    
+    ### Connectivity among predicted occurrence areas
+    
+    land_use_future_within_uc <- raster(paste0("./Araucaria/outputs/binary_",rcp[j],"_",dispersal[q],"_Ucs.tif"))
+    land_use_future_within_uc <- BinaryTransformation(land_use_future_within_uc, 0) #at least three models, 600 counts 3 at least
+    #land_use_current_within_uc <- raster(paste0("./Araucaria/outputs/binary_current_Ucs.tif"))
+     
+    ### Create a matrix from rasters
+    matrix_connect_land_use_uc <- as.matrix(land_use_future_within_uc)  # future data (ensemble all)
+    #matrix_connect_land_use_uc <- as.matrix(land_use_current_within_uc)  # future data (ensemble all)
+    
+    SDA.future_land_use_uc <- sum(values(land_use_future_within_uc)>0,na.rm=TRUE) # dá na mesma se colocar >=1
+    
+    bb_future_land_use_uc <- bbox(land_use_future_within_uc) #fornece uma caixa delimitadora
+    
+    cs <- c(0.15, 0.15)  # cell size 
+    cc_future_land_use_uc <- bb_future_land_use_uc[, 1] + (cs/2)  # cell offset
+    
+    dd_future_land_use_uc <- ceiling(diff(t(bb_future_land_use_uc))/cs)  # number of cells per direction - transforma argumento em vetor
+    
+    grd_future_land_use_uc <- GridTopology(cellcentre.offset=cc_future_land_use_uc, cellsize=cs, cells.dim=dd_future_land_use_uc)
+    
+    ## Conversion from topology to poligon (shape)
+    sp_grd_future_land_use_uc <- SpatialGridDataFrame(grd_future_land_use_uc,
+                                                   data=data.frame(id=1:prod(dd_future_land_use_uc)))
+    
+    sp_grd_future_land_use_uc <- as(sp_grd_future_land_use_uc, "SpatialPixels")
+    
+    sp_grd_future_land_use_uc <- as(sp_grd_future_land_use_uc, "SpatialPolygons")
+    
+    # set CRS
+    
+    proj4string(sp_grd_future_land_use_uc) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
+    
+    names(land_use_future_within_uc)<- "binary"
+    
+    shp_future_land_use_uc <- rasterToPolygons(land_use_future_within_uc, fun=function(x){x>0})
+    
+    proj4string(shp_future_land_use_uc) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+    
+    over_future_land_use_uc <- over(sp_grd_future_land_use_uc, shp_future_land_use_uc) # gathering ucs points 
+    
+    sp_grd_grdDF_future_land_use_uc <- SpatialGridDataFrame(grd_future_land_use_uc, data=data.frame(id=1:prod(dd_future_land_use_uc)))
+    
+    sp_grd_coord_future_land_use_uc <- as(sp_grd_grdDF_future_land_use_uc, "SpatialPixels")
+    
+    sp_grd_coord_DF_future_land_use_uc <- as.data.frame(sp_grd_coord_future_land_use_uc)
+    
+    df_coords_future_land_use_uc <- data.frame(over_future_land_use_uc, sp_grd_coord_DF_future_land_use_uc)
+    
+    names(df_coords_future_land_use_uc)<-c("binary", "lonDD", "latDD")
+    
+    df_coords_future_land_use_uc <-subset(df_coords_future_land_use_uc, binary == 1)
+    
+    # creating graphs using k-nearest neighbours
+    
+    x_future_land_use_uc <- as.matrix(df_coords_future_land_use_uc[,2:3])
+    g_future_land_use_uc <- spatgraph(x_future_land_use_uc, "geometric", par=0.15) 
+    
+    ## Table to compare connectivity within PAs
+    
+    table_fut_land_use_uc <- sum(sapply(g_future_land_use_uc$edges, length)>0)
+    write.table(table_fut_land_use_uc,paste0("./Araucaria/outputs/", dispersal[q],"_",rcp[j],"_",yrs[m],"_Araucaria_connectivity_table_fut_land_use_uc.txt"),sep="\t")
+          
+    
+        }
+      }
+    # Legend
+   
+    breakpoints <- seq(-1,1,by=1)
+    a.arg <- list(at=seq(-1,1,length.out=3), labels=c("","",""), cex.axis=1.2)
+    l.arg <- list(text="Absence/Presence",side=2, line=0.5, cex=1.5)
+    
+    
+    crs(binary_current_teste) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+    crs(dados_finais_current) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+    crs(dados_finais_85_zero) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+    
+    # Plot (Future connectiviy
+    pdf(paste0("./Araucaria/outputs/connectivity_land_use_within_without_uc",rcp[j],"_",yrs[m],"_",
+               dispersal[q],".pdf"),width=14,height=10)
+    
+    plot(dados_finais_85_zero,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+         legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+         axis.args=a.arg,legend.arg=l.arg,
+         axes=FALSE,box=FALSE,zlim=c(-1,1))
+    plot(land_use_future_within_uc,col=viridis_pal(option = "D",alpha = 0.8)(3),
+         axes=F,box=F,add=T,legend=F)
+    points(df_coords_future_land_use$lonDD, df_coords_future_land_use$latDD, 
+           col="gray70", pch=20)
+    plot(g_future_land_use,x_future_land_use, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
+         add=T, col="gray70")
+    points(df_coords_future_land_use_uc$lonDD, df_coords_future_land_use_uc$latDD, 
+           col="green", pch=20)
+    plot(g_future_land_use_uc,x_future_land_use_uc, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
+         add=T, col="green")
+    plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+    plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+    plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+    abline(h=-23.5, lty=2, col="black")
+    legend(-48, -27, legend=c(paste0("Future occurrence RCP ", 
+                                     rcp[j]," ",dispersal[q]," 2085"),
+                              "Future occurrence within PAs",
+                              "Tropic of Capricorn - Dashed Line",
+                              "Future connectivity outside PAs",
+                              "Future connectivity within PAs",
+                              "All Protected Areas contour"),
+           col=c("black","black","black","black","black","black"),
+           fill=c("#21908CFF","#FDE725CC","black","gray70","green","transparent"),box.lty=0)
+        scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+             lonlat = T, lwd = 6)
+    dev.off()
+    
+ 
+
+land_use_current_within_uc <- raster(paste0("./Araucaria/outputs/binary_current_Ucs.tif"))
+land_use_current_within_uc <- BinaryTransformation(land_use_current_within_uc, 0) #at least three models, 600 counts 3 at least
+
+### Create a matrix from rasters
+matrix_connect_land_use_uc <- as.matrix(land_use_current_within_uc)  # current data (ensemble all)
+
+SDA.current_land_use_uc <- sum(values(land_use_current_within_uc)>0,na.rm=TRUE) # dá na mesma se colocar >=1
+
+bb_current_land_use_uc <- bbox(land_use_current_within_uc) #fornece uma caixa delimitadora
+
+cs <- c(0.15, 0.15)  # cell size 
+cc_current_land_use_uc <- bb_current_land_use_uc[, 1] + (cs/2)  # cell offset
+
+dd_current_land_use_uc <- ceiling(diff(t(bb_current_land_use_uc))/cs)  # number of cells per direction - transforma argumento em vetor
+
+grd_current_land_use_uc <- GridTopology(cellcentre.offset=cc_current_land_use_uc, cellsize=cs, cells.dim=dd_current_land_use_uc)
+
+## Conversion from topology to poligon (shape)
+sp_grd_current_land_use_uc <- SpatialGridDataFrame(grd_current_land_use_uc,
+                            data=data.frame(id=1:prod(dd_current_land_use_uc)))
+
+sp_grd_current_land_use_uc <- as(sp_grd_current_land_use_uc, "SpatialPixels")
+
+sp_grd_current_land_use_uc <- as(sp_grd_current_land_use_uc, "SpatialPolygons")
+
+# set CRS
+
+proj4string(sp_grd_current_land_use_uc) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0" 
+
+names(land_use_current_within_uc)<- "binary"
+
+shp_current_land_use_uc <- rasterToPolygons(land_use_current_within_uc, 
+                                            fun=function(x){x>0})
+
+proj4string(shp_current_land_use_uc) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+over_current_land_use_uc <- over(sp_grd_current_land_use_uc, shp_current_land_use_uc) # gathering ucs points 
+
+sp_grd_grdDF_current_land_use_uc <- SpatialGridDataFrame(grd_current_land_use_uc, data=data.frame(id=1:prod(dd_current_land_use_uc)))
+
+sp_grd_coord_current_land_use_uc <- as(sp_grd_grdDF_current_land_use_uc, "SpatialPixels")
+
+sp_grd_coord_DF_current_land_use_uc <- as.data.frame(sp_grd_coord_current_land_use_uc)
+
+df_coords_current_land_use_uc <- data.frame(over_current_land_use_uc, sp_grd_coord_DF_current_land_use_uc)
+
+names(df_coords_current_land_use_uc)<-c("binary", "lonDD", "latDD")
+
+df_coords_current_land_use_uc <-subset(df_coords_current_land_use_uc, binary == 1)
+
+# creating graphs using k-nearest neighbours
+
+x_current_land_use_uc <- as.matrix(df_coords_current_land_use_uc[,2:3])
+g_current_land_use_uc <- spatgraph(x_current_land_use_uc, "geometric", par=0.15) 
+
+## Table to compare connectivity within PAs
+
+table_current_land_use_uc <- sum(sapply(g_current_land_use_uc$edges, length)>0)
+write.table(table_current_land_use_uc,paste0("./Araucaria/outputs/Araucaria_current_connectivity_table_current_land_use_uc.txt"),sep="\t")
+
+# Legend
+breakpoints <- seq(-1,1,by=1)
+a.arg <- list(at=seq(-1,1,length.out=3), labels=c("","",""), cex.axis=1.2)
+l.arg <- list(text="Absence / Presence",side=2, line=0.5, cex=1.5)
+
+
+crs(binary_current_teste) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+crs(dados_finais_current) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+
+# Plot (Future connectiviy
+pdf(paste0("./Araucaria/outputs/current_connectivity_land_use_within_without_uc.pdf"),width=14,height=10)
+
+plot(dados_finais_current,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+     legend.width=1.5,legend.shrink=0.6,legend.mar=7,
+     axis.args=a.arg,legend.arg=l.arg,
+     axes=FALSE,box=FALSE,zlim=c(-1,1))
+plot(land_use_current_within_uc,col=viridis_pal(option = "D",alpha = 0.8)(3),
+     axes=F,box=F,add=T,legend=F)
+points(df_coords_current_land_use$lonDD, df_coords_current_land_use$latDD, 
+       col="gray70", pch=20)
+plot(g_current_land_use,x_current_land_use, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
+     add=T, col="gray70")
+points(df_coords_current_land_use_uc$lonDD, df_coords_current_land_use_uc$latDD, 
+       col="green", pch=20)
+plot(g_current_land_use_uc,x_current_land_use_uc, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
+     add=T, col="green")
+plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+abline(h=-23.5, lty=2, col="black")
+legend(-48, -27, legend=c("Current occurrence with land-use",
+                          "Current occurrence within PAs",
+                          "Tropic of Capricorn - Dashed Line",
+                          "Current connectivity outside PAs",
+                          "Current connectivity within PAs",
+                          "All Protected Areas contour"),
+       col=c("black","black","black","black","black","black"),
+       fill=c("#21908CFF","#FDE725CC","black","gray70","green","transparent"),box.lty=0)
+scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
+         lonlat = T, lwd = 6)
+dev.off()
 
 #getwd()
 library(session)
-memory.limit(size = 10000000000000)
+memory.limit(size = 100000000000000000000)
 ##getwd()
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1")
-#save.session("araucaria_2020.Rda")
+#save.session("araucaria_2020_plos.Rda")
 #restore.session("araucaria_2020.Rda")
+#restore.session("araucaria_2020_plos.Rda")
