@@ -7,14 +7,12 @@ setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 library(plotly)
 library(RColorBrewer)
 library(viridis)
-#library(rJava)
 library(raster)
 library(rgdal)
 library(ENMeval)
 library(maptools)
 library(XML)
 library(dismo) 
-#library(maxent) 
 library(sp) 
 library(MASS)
 library(maps) 
@@ -29,8 +27,6 @@ library(mapdata)
 library(scales) 
 library(ggplot2) 
 library(mapproj)
-library(raster)
-library(dismo)
 library(maxnet)
 library(here)
 
@@ -41,57 +37,45 @@ setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/Bioclim/bio_clim_3")
 #list.files(pattern=".tif")
 bil <- list.files(pattern=".bil") #30 arc
 
-# importar os arquivos no formato rasterstack
+# import rasterstack
 bil.bios <- stack(bil)
 
 # renomear os arquivos .tif importados
 #names(bif.bios) <- paste0('bio', 1:19)
 
-
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
+setwd("set_it/")
 
 mata_atlantica <- readOGR("./Contorno_MA_Original/Contorno MA Original.shp")
 crs(mata_atlantica) <- "+proj=longlat +datum=WGS84 +no_defs +type=crs"
 data.shape <-readOGR("./FOM_ecoregion/Ecorregiões Sul.shp")
 mascara <- data.shape[data.shape$ECO_NAME == "Araucaria moist forests",]
-#mascaranew <- data.shape[data.shape$AREA == "Atlantic Forests"]
 mascara2 <- data.shape[data.shape$ECO_NAME == "Serra do Mar coastal forests",]
 mascarateste2 <- union(mascara,mascara2)
-#mascarafim <- union(mascarateste2,mascara3)
 plot(mascarateste2)
+
 # Set same extent:
 
 mascara_2 <- raster(mascarateste2)
 res(mascara_2) <- 0.008333333 # resolution from altitude
-
 ex_2 <- extent(mascara_2)
 
 # Crop the climate layers to the extent of Mixed Ombrophilous Forest
-altitude1 <- raster("./MDE_Malu/dados_mde_malu/rastert_alt_00.asc") # Altitude
+altitude1 <- raster("./rastert_alt_00.asc") # Altitude
 altitude1 <- raster("http://www.dpi.inpe.br/amb_data/Brasil/altitude_br.asc") # Ambdata website 30 arc-sec res
 altitude <- resample(altitude1,mascara_2,"bilinear")
 altitude <- crop (altitude, ex_2)
 altitude <- mask(altitude,mascarateste2)
 crs(altitude) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
-plot(altitude)
 
 #### bioclim
 bio_curr <- resample(bil.bios, mascara_2,"bilinear")
 bio_curr <- crop(bio_curr, ex_2)
 bio_curr <- mask(bio_curr, mascarateste2)
-#names(bio_curr) <- paste0('bio', 1:19)
 
 predictors_sdm <- bio_curr
 crs(predictors_sdm) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
 predictors_sdm <- addLayer(altitude,bio_curr)
-plot(predictors_sdm)
-
-# TESTANDO 
-
-### 13:11 - 13:59
-#predictors_good_1 <- mask(predictors_good, mascara)
-#predictors_good_1 <- predictors_good 
 
 ## all variables inside the study mask
 names(predictors_sdm) <- c("altitude","bio1","bio10","bio11", "bio12","bio13","bio14",
@@ -101,22 +85,15 @@ names(predictors_sdm) <- c("altitude","bio1","bio10","bio11", "bio12","bio13","b
 #create folder to save organized (inside the mask) variables
 #dir.create('variaves_mascara_2020')
 setwd('./variaves_mascara_2020') 
-
-
 writeRaster(predictors_sdm,('all_variables_mask_plos'), format = 'GTiff', overwrite=T)
-
-
 list.files(pattern=".tif")
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/table_correlation_2020/") 
+setwd("set_it")
 
-
-#======================= AVALIANDO COLINEARIDADE ENTRE VARIAVEIS (PCA E TAL) ===========
+#======================= COLINEARITY ===========
 
 # Avaliando se tenho problema nas minhas variáveis
 
 altmat_val <- c(as.matrix(predictors_sdm$altitude)) # altitude
-##############
 bio01_val <- c(as.matrix(predictors_sdm$bio1)) # bio1
 bio02_val <- c(as.matrix(predictors_sdm$bio2)) # bio2
 bio03_val <- c(as.matrix(predictors_sdm$bio3)) # bio3
@@ -155,7 +132,7 @@ cor(tabela_validos)
 round(cor(tabela_validos),2)
 par(mfrow=c(1,1))
 
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
+setwd("set_it")
 setwd("./table_correlation_2020")
 
 hist(cor(tabela_validos), main="Variable_correlation", col="gray90")
@@ -166,7 +143,7 @@ write.table(ifelse(cor(tabela_validos) >= 0.7, 'Sim', 'Não'), 'cor_pres_afirmac
             sep = '\t')
 see <- (ifelse(cor(tabela_validos) >= 0.7, 'Yes', 'No'))
 
-# plot da correlacao
+# plot corplot
 library(corrplot)
 
 tiff('camadas_ambientais_2020.tif', width = 25, height= 25, units = 'cm', res = 1000, compression = 'lzw')
@@ -176,32 +153,30 @@ dev.off()
 
 # ================================================================
 
-# exportar a figura
+# export it
 tiff('cor_2.tiff', width = 10, height = 12, units = 'in', res = 1000, compression = 'lzw')
 corrplot(cor(tabela_validos), type = "lower", diag = F, 
          title = 'Correlation Bioclimatic Variables', 
          mar = c(3, 0.5, 2, 1), tl.srt = 45)
 dev.off()
 
-# exportar tabela
+# expor table
 tabela.cor <- cor(tabela_validos)
 write.table(tabela.cor, 'tabela_cor_2020.txt', row.names = F, quote = F, sep = '\t')
 write.table(round(tabela.cor, 2), 'tabela_cor_2020.xls', row.names = F, 
             quote = F, sep = '\t')
 
 # PCA for colinearity among variables
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
-
+setwd("set_it")
 setwd('./pca_2020')
 
 # pca do pacote 'stats'
-
 pca <- prcomp(tabela_validos, scale = T)
 
 # eigenvalues
 summary(pca)
 
-# grafico de barras com as contribuicoes
+# barplot graph
 screeplot(pca, main = 'Autovalues')
 abline(h = 1, col = 'red', lty = 2) # 5 variables represent the whole bioclim variables
 
@@ -212,17 +187,16 @@ screeplot(pca, main = 'PCA Auto-value')
 abline(h = 1, col = 'red', lty = 2)
 dev.off()
 
-# valores de cada eixo (eigenvectors - autovetores - escores)
+# eigenvectors - escores)
 pca$x
 
 # relacao das variaveis com cada eixo (loadings - cargas)
 pca$rotation[, 1:5]
 abs(pca$rotation[, 1:5])
 
-# exportar tabela com a contribuicao
+# export table contribution
 write.table(round(abs(pca$rotation[, 1:5]), 2), 'contr_pca_2020.xls', 
             row.names = T, sep = '\t')
-
 # plot
 biplot(pca)
 # import the figure
@@ -232,7 +206,7 @@ biplot(pca, main = 'PCA Auto-value')
 #abline(h = 1, col = 'red', lty = 2)
 dev.off()
 
-# extraindo valores dos arquivos .asc e omitindo os NAs
+# extracting asc. values and removing NAs
 as.v <- values(predictors_sdm)
 as.v.na <- na.omit(as.v)
 head(as.v.na)
@@ -244,15 +218,14 @@ dim(as.v.na)
 library(RStoolbox)
 pca.as <- rasterPCA(predictors_sdm, spca = T) # esse comando ira demorar
 
-# contribuicao dos componentes
+# components PCA contribution
 summary(pca.as$model)
 
-# grafico de barras com as contribuicoes
+# plotting contribution
 getwd()
 screeplot(pca.as$model, main = 'Autovalues')
 abline(h = 1, col = 'red', lty = 2)
 dev.off()
-
 
 tiff('screeplot_raster_plos_2020_demorado.tif', width = 20, height = 20, units = 'cm',
      res = 1000, compression = 'lzw')
@@ -260,70 +233,34 @@ screeplot(pca.as$model, main = 'Autovalues')
 abline(h = 1, col = 'red', lty = 2)
 dev.off()
 
-# plot das pcs como novas variaveis
 plot(pca.as$map[[1:5]])
 
-# exportar as novas variaveis
+# export variables
 setwd('')
 for(i in 1:5){
   writeRaster(pca.as$map[[i]], paste0('pc', i, '_br.asc'), 
               format = 'ascii', overwrite=T)}
 
-###Esta parte padroniza todas as variaveis para terem media ZERO e variancia UM
-###Com isto todas as variveis terao igual peso na hora de gerar os PCAs
+### Testing
 
 library(vegan)
 tabela_validos <- decostand(tabela_validos, method="standardize") 
-
-# Pq standardize? Deixar todos com a mesma media
-## e mesma variancia para que cada variavel responda de modo semelhante a PCA
-
 summary(tabela_validos) # veja as Mean
 
-#.........................
-# Eliminar redundancias via Componente Principal - eliminar o maximo de redundancia possivel. Das vari?veis
-## principais nos geraremos os componentes e avaliaremos quais sao as que mais variam
-
+#
 tabela_validos_prcomp <- prcomp(tabela_validos)
-
 plot(tabela_validos_prcomp)
 axis(1)
 
-###Apresenta variancia para cada PC
+### Each component variance
 std_list <- tabela_validos_prcomp$sdev
 std_list_pct <- std_list / sum (std_list) * 100
 round(std_list_pct, 2)
 
-# aqui o resultado mostra os valores que indicam a
-#porcentagem de variancia em cada eixo
-
-### Correlacao entre cada variavel e as PCs
+# percentage of each component variance
 tabela_validos_prcomp
-
 round(data.frame(tabela_validos_prcomp[2]),2)
-
 head(round(predict(tabela_validos_prcomp),2))
-
-###CRIAR image PC1 usando bio01 como referencia
-###  ... e transformar tudo em NA = sem valor
-imagem_PC2  <- bio04_val
-imagem_PC2[] <- NA
-x11()
-par(mfrow=c(2,2))
-hist(data.frame(predict(tabela_validos_prcomp))$PC1, main="")
-hist(data.frame(predict(tabela_validos_prcomp))$PC3, main="")
-hist(data.frame(predict(tabela_validos_prcomp))$PC6, main="")
-hist(data.frame(predict(tabela_validos_prcomp))$PC8, main="")
-
-imagem_PC2 <- bio01_val
-imagem_PC2[]<-NA
-
-x11()
-par(mfrow=c(2,2))
-hist(data.frame(predict(tabela_validos_prcomp))$PC1, main="")
-hist(data.frame(predict(tabela_validos_prcomp))$PC3, main="")
-hist(data.frame(predict(tabela_validos_prcomp))$PC6, main="")
-hist(data.frame(predict(tabela_validos_prcomp))$PC8, main="")
 
 ### factorial analysys
 
@@ -333,7 +270,7 @@ library(psych)
 library(GPArotation)
 library(vegan)
 
-setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
+setwd("set_it")
 
 #dir.create('fatorial')
 setwd("./fatorial")
@@ -417,8 +354,11 @@ plot(predictos_after_prean)
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 
 dados <- read.csv("dados_atualizados.csv", header=T)
+dados <- read.csv("araucaria.csv", header=T)
+head(dados$datasetKey)
 dados <- dados[,-1]
-
+glimpse(str(dados$datasetKey))
+go <- glimpse(str(dados$datasetKey))
 ###################################################################################
 
 ################ REMOVING CLOSING POINTS AND DUPLICATES ###########################
@@ -524,6 +464,58 @@ ucs_suste <- readOGR("./unidade_uso_sustentavelPolygon.shp")
 #Define proper CRS
 projection(ucs_suste) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
 
+
+#### dados APP em Clevelândia
+
+plot(cleve_app)
+plot(cleve_rl, colour="blue", add=T)
+
+plot.new()
+setwd("D:\\OneDrive\\Doutorado_2020\\Cap_2\\")
+
+cleve_app <- readOGR("./Reserva_legal/2_Parana_APP/APP_Clevelandia.shp")
+projection(cleve_app) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+cleve_rl <- readOGR("./Reserva_legal/3_Parana_RL/RESERVA_LEGAL_Clevelandia.shp")
+projection(cleve_rl) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+#ClevelÃ¢ndia
+muni <- readOGR("./Reserva_legal/BR_Municipios_2020.shp")
+cleve <- (muni[muni$NM_MUN=="ClevelÃ¢ndia",])
+
+reserva_legal <- (cleve_rl[cleve_rl$NOM_TEMA=="Reserva Legal Averbada",])
+
+#### Importar parques
+mozart <- readOGR("./Cap_2/mozart.kml")
+projection(mozart) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+tamarino <- readOGR("./Cap_2/parque_tamarino.kml")
+projection(tamarino) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+sansao <- readOGR("./Cap_2/sansao.kml")
+projection(sansao) <- CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+viridis_pal(option = "D")(3)
+
+plot.new()
+dev.off()
+png(paste0("./reservas_legais.png"),width=15,height=12)
+#par(mar=c(5,3,5,3))
+plot(cleve, axes=T, col="gray90",
+     main="APPs e Reservas Legais de entorno das UCs de Clevelândia", xlab="Longitude", ylab="Latitude")
+plot(cleve_app, axes=T, col="black", add=T)
+plot(reserva_legal, axes=T, col="#3E4A89FF", add=T)
+plot(mozart, col="#FDE725FF",add=T)
+plot(tamarino, col="red",add=T)
+plot(sansao, col="green",add=T)
+plot(cleve_rl, col="pink",add=T)
+
+#plot(mascara2, axes=T, col=viridis_pal(option = "D")(1), add=T)
+legend(-52.3,-26.17, legend=c("Município de Clevelândia","Reservas Legais Averbadas",
+                             "APPs","UC Mozart","UC Tamarino","UC Sansão"),
+                          col=c("black","black","black","black","black","black"),
+                  fill=c("gray90","#3E4A89FF","black","#FDE725FF","red","green"), box.lty=0)
+#plot(estados[estados$Regiao=="SUL",], add=T,border="red")
+dev.off()
+
 # combine both spdf
 ucs_full <- rbind(ucs,ucs_suste)
 # crop it for study area
@@ -609,6 +601,7 @@ str(DataSpecies)
 npix <- nrow(d)
 
 # Plot study area
+
 plot.new()
 setwd("D:/OneDrive/Cap_1_outros_papers/script_art_1/")
 
@@ -2236,28 +2229,29 @@ for (j in 1: length(rcp)) {
     crs(binary_current_teste) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
     crs(dados_finais_current) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
     crs(dados_finais_85_zero) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
-    
+    colors <- c("gray40", "gray10", "#FF0800") 
     # Plot (Future connectiviy
-    pdf(paste0("./Araucaria/outputs/connectivity_land_use_within_without_uc",rcp[j],"_",yrs[m],"_",
+    pdf(paste0("./Araucaria/outputs/connectivity_land_use_within_without_uc_revision",rcp[j],"_",yrs[m],"_",
                dispersal[q],".pdf"),width=14,height=10)
     
-    plot(dados_finais_85_zero,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+    pdf(paste0("./Araucaria/outputs/connectivity_land_use_within_without_uc_revision_finalmap.pdf"),width=14,height=10)
+    plot(dados_finais_85_zero,col= colors,breaks=breakpoints,ext=mascara_2,
          legend.width=1.5,legend.shrink=0.6,legend.mar=7,
          axis.args=a.arg,legend.arg=l.arg,
          axes=FALSE,box=FALSE,zlim=c(-1,1))
-    plot(land_use_future_within_uc,col=viridis_pal(option = "D",alpha = 0.8)(3),
+    plot(land_use_future_within_uc,col=colors,#viridis_pal(option = "D",alpha = 0.8)(3),
          axes=F,box=F,add=T,legend=F)
+    plot(estados[estados$Regiao=="SUL",], add=T,border="black")
+    plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="black")
+    plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="black")
     points(df_coords_future_land_use$lonDD, df_coords_future_land_use$latDD, 
-           col="gray70", pch=20)
+           col="#00FFFF", pch=20) #00FFFF 
     plot(g_future_land_use,x_future_land_use, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
-         add=T, col="gray70")
+         add=T, col="#00FFFF")
     points(df_coords_future_land_use_uc$lonDD, df_coords_future_land_use_uc$latDD, 
-           col="green", pch=20)
+           col="#FFFAFA", pch=20)
     plot(g_future_land_use_uc,x_future_land_use_uc, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
-         add=T, col="green")
-    plot(estados[estados$Regiao=="SUL",], add=T,border="red")
-    plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
-    plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+         add=T, col="#FFFAFA")
     abline(h=-23.5, lty=2, col="black")
     legend(-48, -27, legend=c(paste0("Future occurrence RCP ", 
                                      rcp[j]," ",dispersal[q]," 2085"),
@@ -2267,12 +2261,11 @@ for (j in 1: length(rcp)) {
                               "Future connectivity within PAs",
                               "All Protected Areas contour"),
            col=c("black","black","black","black","black","black"),
-           fill=c("#21908CFF","#FDE725CC","black","gray70","green","transparent"),box.lty=0)
+           fill=c("gray50","#FDE725CC","black","gray70","green","transparent"),box.lty=0)
         scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
              lonlat = T, lwd = 6)
     dev.off()
-    
- 
+   
 
 land_use_current_within_uc <- raster(paste0("./Araucaria/outputs/binary_current_Ucs.tif"))
 land_use_current_within_uc <- BinaryTransformation(land_use_current_within_uc, 0) #at least three models, 600 counts 3 at least
@@ -2343,35 +2336,38 @@ l.arg <- list(text="Absence / Presence",side=2, line=0.5, cex=1.5)
 crs(binary_current_teste) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 crs(dados_finais_current) <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
-# Plot (Future connectiviy
-pdf(paste0("./Araucaria/outputs/current_connectivity_land_use_within_without_uc.pdf"),width=14,height=10)
+colors <- c("gray40", "gray10", "#FF0800") 
+#colors2 <- c("gray50", "gray70", "#39FF14")
+#viridis_pal(option = "D")(3)
 
-plot(dados_finais_current,col= viridis_pal(option = "D")(3),breaks=breakpoints,ext=mascara_2,
+# Plot (Current connectiviy)
+pdf(paste0("./Araucaria/outputs/current_connectivity_land_use_within_without_uc_minor.pdf"),width=14,height=10)
+plot(dados_finais_current,col= colors,breaks=breakpoints,ext=mascara_2,
      legend.width=1.5,legend.shrink=0.6,legend.mar=7,
      axis.args=a.arg,legend.arg=l.arg,
      axes=FALSE,box=FALSE,zlim=c(-1,1))
-plot(land_use_current_within_uc,col=viridis_pal(option = "D",alpha = 0.8)(3),
+plot(land_use_current_within_uc,col= colors,
      axes=F,box=F,add=T,legend=F)
+plot(estados[estados$Regiao=="SUL",], add=T,border="black")
+plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="black")
+plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="black")
 points(df_coords_current_land_use$lonDD, df_coords_current_land_use$latDD, 
-       col="gray70", pch=20)
+       col="#00FFFF", pch=20)
 plot(g_current_land_use,x_current_land_use, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
-     add=T, col="gray70")
+     add=T, col="#00FFFF")
 points(df_coords_current_land_use_uc$lonDD, df_coords_current_land_use_uc$latDD, 
-       col="green", pch=20)
+       col="#FFFAFA", pch=20) #D01C8B
 plot(g_current_land_use_uc,x_current_land_use_uc, xlim=c(-54.45324,-48.16156), ylim=c(-29.73621,-23.56954), 
-     add=T, col="green")
-plot(estados[estados$Regiao=="SUL",], add=T,border="red")
-plot(estados[estados$Nome=="SÃƒO PAULO",], add=T,border="blue")
-plot(estados[estados$Nome=="RIO DE JANEIRO",], add=T,border="orange")
+     add=T, col="#FFFAFA")#FF007F 
 abline(h=-23.5, lty=2, col="black")
-legend(-48, -27, legend=c("Current occurrence with land-use",
-                          "Current occurrence within PAs",
+legend(-48, -27, legend=c("Predicted occurrence with land-use",
+                          "Predicted occurrence within PAs",
                           "Tropic of Capricorn - Dashed Line",
                           "Current connectivity outside PAs",
                           "Current connectivity within PAs",
                           "All Protected Areas contour"),
        col=c("black","black","black","black","black","black"),
-       fill=c("#21908CFF","#FDE725CC","black","gray70","green","transparent"),box.lty=0)
+       fill=c("gray50","#FDE725CC","black","#00FFFF","#FFFAFA","transparent"),box.lty=0)
 scalebar(500, xy = c(-47.5,-29.5), type = 'bar', divs = 2, below = c('km'), 
          lonlat = T, lwd = 6)
 dev.off()
