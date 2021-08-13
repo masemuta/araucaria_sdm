@@ -16,7 +16,7 @@ Data can be found in the `data` folder. The `araucaria_dataset` folder includes 
 
 All the results are saved in the `outputs` folder.
 
-<img alt="Current_distribution_and_projected_distribution" src="outputs/plos_study_area_1.png" width="1000">
+<img alt="Current_distribution_and_projected_distribution" src="outputs/Fig1.tif.tif" width="1000">
 
 Figure 1: **Current distribution and projected distribution**.
 
