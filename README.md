@@ -1,6 +1,6 @@
 # araucaria_sdm
 
-# Relict populations of *Araucaria angustifolia* will be fragmented and poorly protected under climate change in southern Brazil
+# 
 
 The R script `R/araucaria_2020.R` can be run to reproduce the results of the following study:
 
