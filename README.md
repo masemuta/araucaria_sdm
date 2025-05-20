@@ -4,7 +4,7 @@
 
 The R script `R/araucaria_2020.R` can be run to reproduce the results of the following study:
 
-**MUNIZ TAGLIARI Mario, Ghislain VIEILLEDENT, Jonatas ALVES, Tiago Cesar Lima SILVEIRA and Nivaldo PERONI**. 2020. Relict populations of *Araucaria angustifolia* will be isolated and poorly protected under climate and land-use change in Brazil
+**
 
 To run the script, you can either execute the `araucaria_2020.sh` shellscript file or run the R script under a R GUI such as RStudio.
 
